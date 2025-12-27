@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Chrome } from "lucide-react"; // Using Chrome icon as Google proxy
+import { Chrome } from "lucide-react";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -27,10 +28,10 @@ export default function LoginPage() {
                 </div>
 
                 <button
-                    onClick={() => router.push("/dashboard")}
+                    onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
                     className="w-full h-12 flex items-center justify-center gap-3 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 border border-zinc-300 dark:border-zinc-600 rounded-xl transition-all text-zinc-900 dark:text-white font-medium mb-6"
                 >
-                    <Chrome className="w-5 h-5 text-red-500" /> {/* Mock Google Icon */}
+                    <Chrome className="w-5 h-5 text-red-500" />
                     Google ile Oturum Aç
                 </button>
 

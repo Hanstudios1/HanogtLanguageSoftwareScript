@@ -1,17 +1,19 @@
+"use client";
+
 import Link from "next/link";
 import { Github, Download, Code2 } from "lucide-react";
 
 export default function Hero() {
     return (
-        <section className="flex flex-col items-center justify-center min-h-screen text-center px-4 relative overflow-hidden">
-            {/* Background Gradients (Optional aesthetic touch) */}
+        <section className="flex flex-col items-center justify-center min-h-screen text-center px-4 relative overflow-hidden pt-20">
+            {/* Background Gradients */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-500/20 blur-[100px] rounded-full -z-10 dark:bg-purple-900/20" />
 
             {/* Main Heading */}
             <h1 className="text-4xl md:text-6xl font-extrabold text-zinc-900 dark:text-white max-w-4xl leading-tight">
                 İstediğin Kadar <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-green-500">Özgürce Kodla</span>,
                 <br />
-                Dene Ve Test Et
+                Dene Ve Test Et!
             </h1>
 
             {/* Subtext */}
@@ -33,7 +35,7 @@ export default function Hero() {
                 {/* Secondary Buttons */}
                 <div className="flex items-center gap-4">
                     <Link
-                        href="https://github.com"
+                        href="https://github.com/Hanstudios1/HanogtLanguageSoftwareScript"
                         target="_blank"
                         className="px-6 py-3 rounded-full bg-zinc-800 hover:bg-zinc-900 text-white font-medium transition-all shadow-md flex items-center gap-2 border border-zinc-700 hover:border-zinc-500"
                     >
@@ -41,12 +43,14 @@ export default function Hero() {
                         Github
                     </Link>
 
-                    <button
-                        className="px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all shadow-md flex items-center gap-2"
+                    <a
+                        href="/HanogtSetup.exe"
+                        download
+                        className="px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all shadow-md flex items-center gap-2 cursor-pointer"
                     >
                         <Download className="w-5 h-5" />
                         Download The Exe File
-                    </button>
+                    </a>
                 </div>
             </div>
         </section>

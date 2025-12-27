@@ -47,31 +47,27 @@ export default function DashboardPage() {
                     </button>
                 </div>
 
-                {/* Recent Scripts (Mock) */}
+                {/* Recent Scripts (Empty State) */}
                 <section>
                     <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                         <Clock className="w-5 h-5 text-zinc-500" />
                         Son Projeler
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {[1, 2, 3].map((i) => (
-                            <div
-                                key={i}
-                                className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all cursor-pointer group"
-                                onClick={() => router.push("/editor?lang=python")}
-                            >
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                                        <FileCode className="w-6 h-6" />
-                                    </div>
-                                    <button className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full">
-                                        <MoreVertical className="w-4 h-4 text-zinc-400" />
-                                    </button>
-                                </div>
-                                <h3 className="font-bold text-lg mb-1 group-hover:text-blue-500 transition-colors">Project_Final_{i}.py</h3>
-                                <p className="text-sm text-zinc-500 dark:text-zinc-400">Last edited 2 hours ago</p>
-                            </div>
-                        ))}
+
+                    <div className="flex flex-col items-center justify-center p-10 bg-white dark:bg-zinc-900 rounded-2xl border border-dashed border-zinc-300 dark:border-zinc-700 text-center">
+                        <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4">
+                            <FileCode className="w-8 h-8 text-zinc-400" />
+                        </div>
+                        <h3 className="text-lg font-bold text-zinc-800 dark:text-zinc-200">Henüz hiç projen yok</h3>
+                        <p className="text-zinc-500 dark:text-zinc-400 mb-6 max-w-sm">
+                            Hemen "Yeni Script Oluştur" butonuna basarak kodlamaya başla!
+                        </p>
+                        <button
+                            onClick={() => setShowLangModal(true)}
+                            className="text-blue-600 hover:text-blue-700 font-bold"
+                        >
+                            + İlk proteni oluştur
+                        </button>
                     </div>
                 </section>
             </main>

@@ -62,5 +62,12 @@ git push -u origin main
 > *   Eğer şifre sorarsa ve kabul etmezse, GitHub ayarlarından "Personal Access Token" oluşturup şifre yerine onu kullanmanız gerekebilir.
 > *   Ya da `git credential manager` penceresi açılırsa oradan tarayıcı ile giriş yapabilirsiniz.
 
-## Tebrikler! 🎉
-Komut tamamlandığında `Branch 'main' set up to track remote branch 'main' from 'origin'` gibi bir mesaj göreceksiniz. GitHub sayfanızı yenilediğinizde tüm dosyalarınızın orada olduğunu görebilirsiniz.
+## 4. Güncelleme Nasıl Yapılır? (Yeni Özellik Ekledikten Sonra)
+Projeye yeni özellikler ekleyip kaydettikten sonra, bu değişiklikleri GitHub'a göndermek için terminalde şu 3 komutu sırasıyla yazmanız yeterlidir:
+
+```bash
+git add .
+git commit -m "Guncelleme: Yapilan degisikliklerin kisa ozeti"
+git push
+```
+*(Örnek mesaj: "Google Auth eklendi ve Logo düzeltildi" gibi.)*
