@@ -45,4 +45,5 @@ next-env.d.ts
 /release
 /electron/dist
 /electron/build
+package-lock.json
 
