@@ -1,12 +1,14 @@
 import type { NextConfig } from "next";
 
+const isElectron = process.env.ELECTRON_BUILD === "true";
+
 const nextConfig: NextConfig = {
-  output: "export", // Static export for Electron
+  output: isElectron ? "export" : undefined, // Static export ONLY for Electron
   images: {
-    unoptimized: true, // Required for static export
+    unoptimized: isElectron, // Required for static export, but optional for Vercel
   },
   // Ensure trailing slashes for file protocol to work correctly with relative paths
-  trailingSlash: true,
+  trailingSlash: isElectron,
 };
 
 export default nextConfig;

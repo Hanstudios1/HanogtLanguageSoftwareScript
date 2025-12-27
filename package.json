@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "electron-start": "npx electron .",
-    "dist": "npm run build && npx electron ."
+    "dist": "cross-env ELECTRON_BUILD=true npm run build && npx electron ."
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
