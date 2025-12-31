@@ -1,0 +1,146 @@
+"use client";
+
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
+import Sidebar from "@/components/Editor/Sidebar";
+import CodeEditor from "@/components/Editor/CodeEditor";
+import Console from "@/components/Editor/Console";
+import AIAssistant from "@/components/Editor/AIAssistant";
+import { Play } from "lucide-react";
+import { executeCode } from "@/services/piston";
+import Header from "@/components/Header";
+import { useSession } from "next-auth/react";
+import { saveProject } from "@/lib/storage";
+
+// Default code templates
+const TEMPLATES: Record<string, string> = {
+    python: "def main():\n    print('Hello World from Hanogt!')\n\nif __name__ == '__main__':\n    main()",
+    javascript: "console.log('Hello World from Hanogt!');",
+    csharp: "using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine('Hello World');\n    }\n}",
+    cpp: "#include <iostream>\n\nint main() {\n    std::cout << \"Hello World\";\n    return 0;\n}",
+    java: "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello World\");\n    }\n}",
+    html: "<html>\n<body>\n    <h1>Hello World</h1>\n</body>\n</html>",
+    // Fallback
+    default: "// Start coding here...",
+};
+
+function EditorContent() {
+    const searchParams = useSearchParams();
+    const lang = searchParams.get("lang") || "javascript";
+    const { data: session } = useSession();
+
+    const [code, setCode] = useState("");
+    const [output, setOutput] = useState<string[]>([]);
+    const [isRunning, setIsRunning] = useState(false);
+
+    useEffect(() => {
+        // Set initial template
+        setCode(TEMPLATES[lang] || TEMPLATES["default"]);
+    }, [lang]);
+
+    const handleRun = async () => {
+        setIsRunning(true);
+        setOutput([]);
+
+        try {
+            const result = await executeCode(lang, code);
+            setOutput([
+                `> Executing ${lang} script...`,
+                ...(result.run.stdout ? result.run.stdout.split('\n') : []),
+                ...(result.run.stderr ? [`Error: ${result.run.stderr}`] : []),
+                `> Process finished with exit code ${result.run.code}`
+            ]);
+        } catch (error) {
+            setOutput([`> Execution failed:`, String(error)]);
+        } finally {
+            setIsRunning(false);
+        }
+    };
+
+    const handleSave = () => {
+        if (!session?.user?.email) {
+            alert("Lütfen önce giriş yapın! (Please login first)");
+            return;
+        }
+
+        const name = prompt("Projenize bir isim verin:", `My ${lang} Project`);
+        if (!name) return;
+
+        saveProject(session.user.email, {
+            id: Date.now(),
+            name,
+            lang,
+            code,
+            date: new Date().toLocaleDateString("tr-TR", { hour: '2-digit', minute: '2-digit' })
+        });
+
+        alert("Proje başarıyla kaydedildi! Dashboard'da görebilirsiniz.");
+    };
+
+    const handleDownload = () => {
+        // Mock download
+        const element = document.createElement("a");
+        const file = new Blob([code], { type: 'text/plain' });
+        element.href = URL.createObjectURL(file);
+        element.download = `script.${lang === 'python' ? 'py' : lang === 'javascript' ? 'js' : 'txt'}`;
+        document.body.appendChild(element);
+        element.click();
+    };
+
+    return (
+        <div className="flex h-screen w-full bg-zinc-50 dark:bg-black text-zinc-900 dark:text-white transition-colors overflow-hidden">
+            {/* Sidebar */}
+            <Sidebar onSave={handleSave} onDownload={handleDownload} />
+
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col h-full relative">
+                {/* Top Bar for Run Button */}
+                <div className="h-16 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-6 bg-white dark:bg-zinc-950">
+                    <h2 className="font-bold text-lg capitalize flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                        {lang} Project
+                    </h2>
+
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={handleRun}
+                            className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-full font-bold flex items-center gap-2 shadow-lg hover:shadow-green-500/30 transition-all"
+                        >
+                            <Play className="w-4 h-4 fill-current" />
+                            RUN
+                        </button>
+                    </div>
+                </div>
+
+                {/* Editor & Console Split */}
+                <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+                    {/* Editor Area */}
+                    <div className="flex-1 h-[60%] lg:h-full p-2 lg:p-4">
+                        <CodeEditor
+                            language={lang === 'c++' ? 'cpp' : lang}
+                            theme="dark" // Default to dark for editor
+                            value={code}
+                            onChange={(val) => setCode(val || "")}
+                        />
+                    </div>
+
+                    {/* Console Area (Right Side) */}
+                    <div className="h-[40%] lg:h-full lg:w-[400px] border-t lg:border-t-0 lg:border-l border-zinc-200 dark:border-zinc-800 bg-zinc-900 p-2 lg:p-4">
+                        <Console output={output} isRunning={isRunning} onClear={() => setOutput([])} />
+                    </div>
+                </div>
+
+                {/* AI Overlay */}
+                <AIAssistant />
+            </div>
+        </div>
+    );
+}
+
+export default function EditorPage() {
+    return (
+        <Suspense fallback={<div className="flex h-screen items-center justify-center bg-zinc-950 text-white">Loading Editor...</div>}>
+            <EditorContent />
+        </Suspense>
+    );
+}

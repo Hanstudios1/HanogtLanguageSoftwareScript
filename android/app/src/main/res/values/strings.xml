@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Hanogt Codev</string>
+    <string name="title_activity_main">Hanogt Codev</string>
+    <string name="package_name">com.hanogt.codev</string>
+    <string name="custom_url_scheme">com.hanogt.codev</string>
+</resources>
