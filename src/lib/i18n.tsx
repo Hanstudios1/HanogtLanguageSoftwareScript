@@ -32,6 +32,7 @@ const DICTIONARY: Record<Language, Translations> = {
         enter_project_name: "Proje ismini girin:",
         first_project: "İlk projeni oluştur",
         recent_projects: "Son Projeler",
+        dashboard_title: "Gösterge Paneli",
         dashboard_desc: "Projelerini yönet ve yeni scriptler oluştur.",
         // Landing Page
         banner_warning: "Bu Uygulama Daha Test Aşamasındadır, Lütfen Anlayış Gösteriniz.",
@@ -183,6 +184,7 @@ const DICTIONARY: Record<Language, Translations> = {
         enter_project_name: "Enter project name:",
         first_project: "Create your first project",
         recent_projects: "Recent Projects",
+        dashboard_title: "Dashboard",
         dashboard_desc: "Manage your projects and create new scripts.",
         // Landing Page
         banner_warning: "This application is in testing phase, please be understanding.",
@@ -329,6 +331,7 @@ const DICTIONARY: Record<Language, Translations> = {
         enter_project_name: "Введите название проекта:",
         first_project: "Создайте свой первый проект",
         recent_projects: "Недавние проекты",
+        dashboard_title: "Панель управления",
         dashboard_desc: "Управляйте проектами и создавайте новые скрипты.",
         // Landing Page
         banner_warning: "Это приложение находится на стадии тестирования, пожалуйста, будьте снисходительны.",
@@ -448,6 +451,7 @@ const DICTIONARY: Record<Language, Translations> = {
         enter_project_name: "Layihə adını daxil edin:",
         first_project: "İlk layihəni yarat",
         recent_projects: "Son Layihələr",
+        dashboard_title: "Göstərici Paneli",
         dashboard_desc: "Layihələrini idarə et və yeni skriptlər yarat.",
         // Landing Page
         banner_warning: "Bu tətbiq test mərhələsindədir, zəhmət olmasa anlayış göstərin.",
@@ -566,6 +570,7 @@ const DICTIONARY: Record<Language, Translations> = {
         enter_project_name: "Ingrese el nombre del proyecto:",
         first_project: "Crea tu primer proyecto",
         recent_projects: "Proyectos Recientes",
+        dashboard_title: "Panel de Control",
         dashboard_desc: "Administra tus proyectos y crea nuevos scripts.",
         // Landing Page
         banner_warning: "Esta aplicación está en fase de prueba, por favor comprenda.",
@@ -684,6 +689,7 @@ const DICTIONARY: Record<Language, Translations> = {
         enter_project_name: "Жоба атын енгізіңіз:",
         first_project: "Алғашқы жобаңызды жасаңыз",
         recent_projects: "Соңғы Жобалар",
+        dashboard_title: "Басқару панелі",
         dashboard_desc: "Жобаларыңызды басқарыңыз және жаңа сценарийлер жасаңыз.",
         // Landing Page
         banner_warning: "Бұл қосымша сынақ сатысында, түсіністікпен қарауыңызды сұраймыз.",
@@ -802,6 +808,7 @@ const DICTIONARY: Record<Language, Translations> = {
         enter_project_name: "プロジェクト名を入力してください：",
         first_project: "最初のプロジェクトを作成",
         recent_projects: "最近のプロジェクト",
+        dashboard_title: "ダッシュボード",
         dashboard_desc: "プロジェクトを管理し、新しいスクリプトを作成します。",
         // Landing Page
         banner_warning: "このアプリケーションはテスト段階です。ご理解ください。",
@@ -920,6 +927,7 @@ const DICTIONARY: Record<Language, Translations> = {
         enter_project_name: "输入项目名称：",
         first_project: "创建你的第一个项目",
         recent_projects: "最近的项目",
+        dashboard_title: "控制面板",
         dashboard_desc: "管理你的项目并创建新脚本。",
         // Landing Page
         banner_warning: "该应用程序处于测试阶段，请谅解。",
@@ -1038,6 +1046,7 @@ const DICTIONARY: Record<Language, Translations> = {
         enter_project_name: "프로젝트 이름을 입력하세요:",
         first_project: "첫 번째 프로젝트 만들기",
         recent_projects: "최근 프로젝트",
+        dashboard_title: "대시보드",
         dashboard_desc: "프로젝트를 관리하고 새 스크립트를 만듭니다.",
         // Landing Page
         banner_warning: "이 애플리케이션은 테스트 단계입니다. 양해 부탁드립니다.",

@@ -127,7 +127,7 @@ export default function DashboardPage() {
             <main className="pt-24 px-6 max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-10">
                     <div>
-                        <h1 className="text-3xl font-bold">Dashboard</h1>
+                        <h1 className="text-3xl font-bold">{t("dashboard_title") || "Gösterge Paneli"}</h1>
                         <p className="text-zinc-500 dark:text-zinc-400">{t("dashboard_desc")}</p>
                     </div>
                     <button
@@ -171,10 +171,19 @@ export default function DashboardPage() {
                                 >
                                     <div className="flex justify-between items-start mb-4">
                                         <div
-                                            className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold uppercase text-xs cursor-pointer"
+                                            className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center cursor-pointer overflow-hidden"
                                             onClick={() => router.push(`/editor?lang=${p.lang}&id=${p.id}`)}
                                         >
-                                            {p.lang.substring(0, 2)}
+                                            <img
+                                                src={LANGUAGES.find(l => l.name.toLowerCase() === p.lang.toLowerCase())?.logo || `/languages/${p.lang.toLowerCase()}.png`}
+                                                alt={p.lang}
+                                                className="w-7 h-7 object-contain"
+                                                onError={(e) => {
+                                                    // Fallback to text if image fails
+                                                    e.currentTarget.style.display = 'none';
+                                                    e.currentTarget.parentElement!.innerHTML = `<span class="text-blue-600 dark:text-blue-400 font-bold uppercase text-xs">${p.lang.substring(0, 2)}</span>`;
+                                                }}
+                                            />
                                         </div>
 
                                         {/* Three Dots Menu */}
