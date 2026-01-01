@@ -10,7 +10,7 @@ import { Play } from "lucide-react";
 import { executeCode } from "@/services/piston";
 import Header from "@/components/Header";
 import { useSession } from "next-auth/react";
-import { saveProject } from "@/lib/storage";
+import { saveProject, getProjects, getProjectsFromCloud } from "@/lib/storage";
 import { useI18n } from "@/lib/i18n";
 
 // Default code templates
@@ -28,16 +28,53 @@ const TEMPLATES: Record<string, string> = {
 function EditorContent() {
     const searchParams = useSearchParams();
     const lang = searchParams.get("lang") || "javascript";
+    const projectId = searchParams.get("id"); // Get project ID from URL
     const { data: session } = useSession();
+    const { t } = useI18n();
 
     const [code, setCode] = useState("");
     const [output, setOutput] = useState<string[]>([]);
     const [isRunning, setIsRunning] = useState(false);
+    const [currentProjectId, setCurrentProjectId] = useState<number | null>(null);
+    const [currentProjectName, setCurrentProjectName] = useState<string>("");
 
+    // Load existing project or set template
     useEffect(() => {
-        // Set initial template
-        setCode(TEMPLATES[lang] || TEMPLATES["default"]);
-    }, [lang]);
+        const loadProject = async () => {
+            if (projectId && session?.user?.email) {
+                // Try to load from cloud first
+                try {
+                    const cloudProjects = await getProjectsFromCloud(session.user.email);
+                    const project = cloudProjects.find(p => String(p.id) === projectId);
+                    if (project) {
+                        setCode(project.code);
+                        setCurrentProjectId(Number(project.id));
+                        setCurrentProjectName(project.name);
+                        return;
+                    }
+                } catch (error) {
+                    console.error("Error loading from cloud:", error);
+                }
+
+                // Fallback to localStorage
+                const localProjects = getProjects(session.user.email);
+                const project = localProjects.find(p => String(p.id) === projectId);
+                if (project) {
+                    setCode(project.code);
+                    setCurrentProjectId(project.id);
+                    setCurrentProjectName(project.name);
+                    return;
+                }
+            }
+
+            // No existing project, use template
+            setCode(TEMPLATES[lang] || TEMPLATES["default"]);
+            setCurrentProjectId(null);
+            setCurrentProjectName("");
+        };
+
+        loadProject();
+    }, [lang, projectId, session]);
 
     const handleRun = async () => {
         setIsRunning(true);
@@ -58,21 +95,30 @@ function EditorContent() {
         }
     };
 
-    const { t } = useI18n();
-
     const handleSave = () => {
         if (!session?.user?.email) {
             alert(t("please_login_first") || "Lütfen önce giriş yapın!");
             return;
         }
 
-        const defaultName = `${t("my_lang_project_prefix") || "Benim"} ${lang.charAt(0).toUpperCase() + lang.slice(1)} ${t("my_lang_project_suffix") || "Projem"}`;
-        const name = prompt(t("give_project_name") || "Projenize bir isim verin:", defaultName);
-        if (!name) return;
+        let projectName = currentProjectName;
+        let projectIdToUse = currentProjectId;
+
+        // If this is a new project, ask for name
+        if (!projectIdToUse) {
+            const defaultName = `${t("my_lang_project_prefix") || "Benim"} ${lang.charAt(0).toUpperCase() + lang.slice(1)} ${t("my_lang_project_suffix") || "Projem"}`;
+            const name = prompt(t("give_project_name") || "Projenize bir isim verin:", defaultName);
+            if (!name) return;
+
+            projectName = name;
+            projectIdToUse = Date.now();
+            setCurrentProjectId(projectIdToUse);
+            setCurrentProjectName(name);
+        }
 
         saveProject(session.user.email, {
-            id: Date.now(),
-            name,
+            id: projectIdToUse,
+            name: projectName,
             lang,
             code,
             date: new Date().toLocaleDateString("tr-TR", { hour: '2-digit', minute: '2-digit' })
@@ -102,7 +148,7 @@ function EditorContent() {
                 <div className="h-16 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-6 bg-white dark:bg-zinc-950">
                     <h2 className="font-bold text-lg capitalize flex items-center gap-2">
                         <span className="w-3 h-3 rounded-full bg-green-500"></span>
-                        {lang} Project
+                        {currentProjectName || `${lang} Project`}
                     </h2>
 
                     <div className="flex items-center gap-3">
