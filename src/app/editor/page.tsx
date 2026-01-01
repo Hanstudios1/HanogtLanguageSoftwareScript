@@ -11,6 +11,7 @@ import { executeCode } from "@/services/piston";
 import Header from "@/components/Header";
 import { useSession } from "next-auth/react";
 import { saveProject } from "@/lib/storage";
+import { useI18n } from "@/lib/i18n";
 
 // Default code templates
 const TEMPLATES: Record<string, string> = {
@@ -57,13 +58,16 @@ function EditorContent() {
         }
     };
 
+    const { t } = useI18n();
+
     const handleSave = () => {
         if (!session?.user?.email) {
-            alert("Lütfen önce giriş yapın! (Please login first)");
+            alert(t("please_login_first") || "Lütfen önce giriş yapın!");
             return;
         }
 
-        const name = prompt("Projenize bir isim verin:", `My ${lang} Project`);
+        const defaultName = `${t("my_lang_project_prefix") || "Benim"} ${lang.charAt(0).toUpperCase() + lang.slice(1)} ${t("my_lang_project_suffix") || "Projem"}`;
+        const name = prompt(t("give_project_name") || "Projenize bir isim verin:", defaultName);
         if (!name) return;
 
         saveProject(session.user.email, {
@@ -74,7 +78,7 @@ function EditorContent() {
             date: new Date().toLocaleDateString("tr-TR", { hour: '2-digit', minute: '2-digit' })
         });
 
-        alert("Proje başarıyla kaydedildi! Dashboard'da görebilirsiniz.");
+        alert(t("project_saved") || "Proje başarıyla kaydedildi! Dashboard'da görebilirsiniz.");
     };
 
     const handleDownload = () => {
