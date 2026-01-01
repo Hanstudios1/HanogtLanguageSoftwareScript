@@ -30,7 +30,7 @@ export async function POST(req: Request) {
             const existingUser = await getDoc(doc(db, "users", normalizedEmail));
             if (existingUser.exists()) {
                 return NextResponse.json(
-                    { error: "Bu e-posta adresi zaten kayıtlı" },
+                    { error: "Böyle bir hesap zaten oluşturuldu. Lütfen giriş yapmayı deneyin!" },
                     { status: 400 }
                 );
             }
