@@ -128,13 +128,38 @@ function EditorContent() {
     };
 
     const handleDownload = () => {
-        // Mock download
+        // File extensions for each language
+        const extensions: Record<string, string> = {
+            python: "py",
+            javascript: "js",
+            csharp: "cs",
+            cpp: "cpp",
+            java: "java",
+            html: "html",
+            css: "css",
+            php: "php",
+            go: "go",
+            swift: "swift",
+            sql: "sql",
+            lua: "lua",
+            typescript: "ts",
+            ruby: "rb",
+            rust: "rs",
+            kotlin: "kt",
+        };
+
+        const ext = extensions[lang.toLowerCase()] || "txt";
+        const fileName = currentProjectName
+            ? `${currentProjectName.replace(/[^a-zA-Z0-9]/g, "_")}.${ext}`
+            : `script.${ext}`;
+
         const element = document.createElement("a");
         const file = new Blob([code], { type: 'text/plain' });
         element.href = URL.createObjectURL(file);
-        element.download = `script.${lang === 'python' ? 'py' : lang === 'javascript' ? 'js' : 'txt'}`;
+        element.download = fileName;
         document.body.appendChild(element);
         element.click();
+        document.body.removeChild(element);
     };
 
     return (
