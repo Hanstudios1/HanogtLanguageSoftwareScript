@@ -115,7 +115,7 @@ const DICTIONARY: Record<Language, Translations> = {
         signup_success: "Hesap oluşturuldu! Giriş yapılıyor...",
         passwords_not_match: "Şifreler eşleşmiyor!",
         password_too_short: "Şifre en az 6 karakter olmalıdır",
-        go_to_dashboard: "Dashboard'a Git",
+        go_to_dashboard: "Gösterge Paneli'ne Git!",
         download_app: "Bu Uygulamayı Cihazına İndir",
         recommended: "Önerilen",
         // Slider Comparison

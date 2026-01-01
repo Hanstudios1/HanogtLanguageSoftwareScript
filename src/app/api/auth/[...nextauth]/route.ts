@@ -22,8 +22,11 @@ const handler = NextAuth({
                 }
 
                 try {
+                    // Normalize email
+                    const normalizedEmail = credentials.email.toLowerCase().trim();
+
                     // Check user in Firebase
-                    const userDoc = await getDoc(doc(db, "users", credentials.email));
+                    const userDoc = await getDoc(doc(db, "users", normalizedEmail));
 
                     if (!userDoc.exists()) {
                         return null;
@@ -37,9 +40,9 @@ const handler = NextAuth({
                     }
 
                     return {
-                        id: credentials.email,
-                        email: credentials.email,
-                        name: userData.username || userData.email,
+                        id: normalizedEmail,
+                        email: normalizedEmail,
+                        name: userData.username || normalizedEmail,
                         image: userData.avatarUrl || null,
                     };
                 } catch (error) {
