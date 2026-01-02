@@ -10,6 +10,7 @@ const DICTIONARY: Record<Language, Translations> = {
     TR: {
         welcome: "Hoş Geldiniz",
         create_project: "Yeni Proje Oluştur",
+        select_language: "Bir Yazılım Dili Seç",
         my_projects: "Projelerim",
         save: "Kaydet",
         run: "Çalıştır",
@@ -167,6 +168,7 @@ const DICTIONARY: Record<Language, Translations> = {
     EN: {
         welcome: "Welcome",
         create_project: "Create New Project",
+        select_language: "Select a Programming Language",
         my_projects: "My Projects",
         save: "Save",
         run: "Run",
@@ -318,6 +320,7 @@ const DICTIONARY: Record<Language, Translations> = {
     RU: {
         welcome: "Добро пожаловать",
         create_project: "Создать проект",
+        select_language: "Выберите язык программирования",
         my_projects: "Мои проекты",
         save: "Сохранить",
         run: "Запустить",
@@ -448,6 +451,7 @@ const DICTIONARY: Record<Language, Translations> = {
     AZ: {
         welcome: "Xoş gəlmisiniz",
         create_project: "Yeni Layihə Yarat",
+        select_language: "Proqramlaşdırma Dilini Seçin",
         my_projects: "Layihələrim",
         save: "Yadda saxla",
         run: "İşlət",
@@ -577,6 +581,7 @@ const DICTIONARY: Record<Language, Translations> = {
     ES: {
         welcome: "Bienvenido",
         create_project: "Crear Proyecto",
+        select_language: "Seleccionar un Lenguaje de Programación",
         my_projects: "Mis Proyectos",
         save: "Guardar",
         run: "Ejecutar",
@@ -706,6 +711,7 @@ const DICTIONARY: Record<Language, Translations> = {
     KZ: {
         welcome: "Қош келдіңіз",
         create_project: "Жаңа жоба құру",
+        select_language: "Программалау тілін таңдаңыз",
         my_projects: "Менің жобаларым",
         save: "Сақтау",
         run: "Іске қосу",
@@ -835,6 +841,7 @@ const DICTIONARY: Record<Language, Translations> = {
     JP: {
         welcome: "ようこそ",
         create_project: "新規プロジェクト作成",
+        select_language: "プログラミング言語を選択",
         my_projects: "マイプロジェクト",
         save: "保存",
         run: "実行",
@@ -964,6 +971,7 @@ const DICTIONARY: Record<Language, Translations> = {
     CN: {
         welcome: "欢迎",
         create_project: "创建新项目",
+        select_language: "选择编程语言",
         my_projects: "我的项目",
         save: "保存",
         run: "运行",
@@ -1093,6 +1101,7 @@ const DICTIONARY: Record<Language, Translations> = {
     KR: {
         welcome: "환영합니다",
         create_project: "새 프로젝트 만들기",
+        select_language: "프로그래밍 언어 선택",
         my_projects: "내 프로젝트",
         save: "저장",
         run: "실행",

@@ -182,7 +182,14 @@ function EditorContent() {
                 {/* Top Bar for Run Button */}
                 <div className="h-16 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-6 bg-white dark:bg-zinc-950">
                     <h2 className="font-bold text-lg capitalize flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                        <img
+                            src={`/languages/${lang.toLowerCase()}.png`}
+                            alt={lang}
+                            className="w-6 h-6 object-contain"
+                            onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                            }}
+                        />
                         {currentProjectName || `${lang} Project`}
                     </h2>
 
