@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 
 export default function ScrollLines() {
     const [scrollY, setScrollY] = useState(0);
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
         const handleScroll = () => {
             setScrollY(window.scrollY);
         };
@@ -14,137 +16,150 @@ export default function ScrollLines() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    // Calculate line movements based on scroll
-    const line1Y = scrollY * 0.15;
-    const line2Y = scrollY * 0.25;
-    const line3Y = scrollY * 0.2;
+    if (!mounted) return null;
+
+    // Parallax effect - lines move at different speeds
+    const parallax1 = scrollY * 0.08;
+    const parallax2 = scrollY * 0.12;
+    const parallax3 = scrollY * 0.1;
 
     return (
-        <>
-            {/* Line 1 - Green curved line on left side */}
-            <div
-                className="fixed left-0 top-0 w-full h-full pointer-events-none z-0 overflow-hidden"
-                style={{ opacity: Math.max(0, 1 - scrollY / 2000) }}
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+            {/* Neon Green Line - Left Side */}
+            <svg
+                className="absolute w-full h-full"
+                preserveAspectRatio="none"
+                style={{
+                    transform: `translateY(${parallax1}px)`,
+                }}
             >
-                <svg
-                    className="absolute -left-20 top-[30%]"
-                    width="300"
-                    height="1500"
-                    viewBox="0 0 300 1500"
+                <defs>
+                    <linearGradient id="neonGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#22c55e" stopOpacity="0" />
+                        <stop offset="15%" stopColor="#22c55e" stopOpacity="0.8" />
+                        <stop offset="50%" stopColor="#16a34a" stopOpacity="1" />
+                        <stop offset="85%" stopColor="#22c55e" stopOpacity="0.8" />
+                        <stop offset="100%" stopColor="#22c55e" stopOpacity="0" />
+                    </linearGradient>
+                    <filter id="glow1" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                        <feMerge>
+                            <feMergeNode in="coloredBlur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+                <path
+                    d="M 80 -100 
+                       Q 120 200, 60 500 
+                       Q 0 800, 100 1100 
+                       Q 200 1400, 50 1700 
+                       Q -50 2000, 120 2300"
+                    stroke="url(#neonGreen)"
+                    strokeWidth="2"
                     fill="none"
-                    style={{
-                        transform: `translateY(${line1Y}px)`,
-                        transition: "transform 0.05s linear",
-                    }}
-                >
-                    <path
-                        d="M 150 0 
-                           C 250 200, 50 400, 150 600 
-                           C 250 800, 50 1000, 150 1200 
-                           C 250 1400, 100 1500, 150 1500"
-                        stroke="url(#greenGradient)"
-                        strokeWidth="3"
-                        fill="none"
-                        strokeLinecap="round"
-                    />
-                    <defs>
-                        <linearGradient id="greenGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="#22c55e" stopOpacity="0" />
-                            <stop offset="20%" stopColor="#22c55e" stopOpacity="0.7" />
-                            <stop offset="50%" stopColor="#16a34a" stopOpacity="0.8" />
-                            <stop offset="80%" stopColor="#15803d" stopOpacity="0.7" />
-                            <stop offset="100%" stopColor="#166534" stopOpacity="0" />
-                        </linearGradient>
-                    </defs>
-                </svg>
+                    filter="url(#glow1)"
+                    opacity="0.7"
+                />
+            </svg>
 
-                {/* Line 2 - Teal/Cyan curved line on right side */}
-                <svg
-                    className="absolute -right-20 top-[20%]"
-                    width="300"
-                    height="1800"
-                    viewBox="0 0 300 1800"
+            {/* Cyan/Teal Line - Right Side */}
+            <svg
+                className="absolute w-full h-full"
+                preserveAspectRatio="none"
+                style={{
+                    transform: `translateY(${parallax2}px)`,
+                }}
+            >
+                <defs>
+                    <linearGradient id="neonCyan" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#06b6d4" stopOpacity="0" />
+                        <stop offset="20%" stopColor="#06b6d4" stopOpacity="0.7" />
+                        <stop offset="50%" stopColor="#0891b2" stopOpacity="0.9" />
+                        <stop offset="80%" stopColor="#06b6d4" stopOpacity="0.7" />
+                        <stop offset="100%" stopColor="#06b6d4" stopOpacity="0" />
+                    </linearGradient>
+                    <filter id="glow2" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                        <feMerge>
+                            <feMergeNode in="coloredBlur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+                <path
+                    d="M 1360 -50 
+                       Q 1280 250, 1380 550 
+                       Q 1480 850, 1300 1150 
+                       Q 1120 1450, 1400 1750 
+                       Q 1500 2050, 1250 2350"
+                    stroke="url(#neonCyan)"
+                    strokeWidth="2"
                     fill="none"
-                    style={{
-                        transform: `translateY(${line2Y}px)`,
-                        transition: "transform 0.05s linear",
-                    }}
-                >
-                    <path
-                        d="M 150 0 
-                           C 50 300, 250 500, 150 800 
-                           C 50 1100, 250 1300, 150 1600 
-                           C 50 1750, 200 1800, 150 1800"
-                        stroke="url(#cyanGradient)"
-                        strokeWidth="2.5"
-                        fill="none"
-                        strokeLinecap="round"
-                    />
-                    <defs>
-                        <linearGradient id="cyanGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="#06b6d4" stopOpacity="0" />
-                            <stop offset="20%" stopColor="#06b6d4" stopOpacity="0.6" />
-                            <stop offset="50%" stopColor="#0891b2" stopOpacity="0.7" />
-                            <stop offset="80%" stopColor="#0e7490" stopOpacity="0.6" />
-                            <stop offset="100%" stopColor="#155e75" stopOpacity="0" />
-                        </linearGradient>
-                    </defs>
-                </svg>
+                    filter="url(#glow2)"
+                    opacity="0.6"
+                />
+            </svg>
 
-                {/* Line 3 - Purple/Violet accent line center-left */}
-                <svg
-                    className="absolute left-[15%] top-[50%]"
-                    width="200"
-                    height="1200"
-                    viewBox="0 0 200 1200"
+            {/* Purple/Violet Line - Center accent */}
+            <svg
+                className="absolute w-full h-full"
+                preserveAspectRatio="none"
+                style={{
+                    transform: `translateY(${parallax3}px)`,
+                }}
+            >
+                <defs>
+                    <linearGradient id="neonPurple" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#a855f7" stopOpacity="0" />
+                        <stop offset="25%" stopColor="#a855f7" stopOpacity="0.6" />
+                        <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.8" />
+                        <stop offset="75%" stopColor="#a855f7" stopOpacity="0.6" />
+                        <stop offset="100%" stopColor="#a855f7" stopOpacity="0" />
+                    </linearGradient>
+                    <filter id="glow3" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                        <feMerge>
+                            <feMergeNode in="coloredBlur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+                <path
+                    d="M 300 400 
+                       Q 450 700, 280 1000 
+                       Q 110 1300, 350 1600 
+                       Q 500 1900, 250 2200"
+                    stroke="url(#neonPurple)"
+                    strokeWidth="1.5"
                     fill="none"
-                    style={{
-                        transform: `translateY(${line3Y}px)`,
-                        transition: "transform 0.05s linear",
-                    }}
-                >
-                    <path
-                        d="M 100 0 
-                           C 180 200, 20 400, 100 600 
-                           C 180 800, 20 1000, 100 1200"
-                        stroke="url(#purpleGradient)"
-                        strokeWidth="2"
-                        fill="none"
-                        strokeLinecap="round"
-                    />
-                    <defs>
-                        <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="#a855f7" stopOpacity="0" />
-                            <stop offset="30%" stopColor="#a855f7" stopOpacity="0.5" />
-                            <stop offset="70%" stopColor="#7c3aed" stopOpacity="0.5" />
-                            <stop offset="100%" stopColor="#6d28d9" stopOpacity="0" />
-                        </linearGradient>
-                    </defs>
-                </svg>
+                    filter="url(#glow3)"
+                    opacity="0.5"
+                />
+            </svg>
 
-                {/* Decorative circles */}
-                <div
-                    className="absolute left-[5%] top-[40%] w-80 h-80 rounded-full border border-zinc-700/20 dark:border-zinc-600/10"
-                    style={{
-                        transform: `translateY(${line1Y * 0.3}px)`,
-                        transition: "transform 0.1s linear",
-                    }}
-                />
-                <div
-                    className="absolute right-[10%] top-[60%] w-64 h-64 rounded-full border border-zinc-700/15 dark:border-zinc-600/10"
-                    style={{
-                        transform: `translateY(${line2Y * 0.2}px)`,
-                        transition: "transform 0.1s linear",
-                    }}
-                />
-                <div
-                    className="absolute left-[30%] top-[80%] w-48 h-48 rounded-full border border-green-500/10"
-                    style={{
-                        transform: `translateY(${line3Y * 0.4}px)`,
-                        transition: "transform 0.1s linear",
-                    }}
-                />
-            </div>
-        </>
+            {/* Decorative subtle circles that also parallax */}
+            <div
+                className="absolute left-[5%] top-[35%] w-96 h-96 rounded-full border border-zinc-800/30"
+                style={{
+                    transform: `translateY(${parallax1 * 0.5}px)`,
+                }}
+            />
+            <div
+                className="absolute right-[8%] top-[55%] w-72 h-72 rounded-full border border-zinc-700/20"
+                style={{
+                    transform: `translateY(${parallax2 * 0.3}px)`,
+                }}
+            />
+
+            {/* Small dot accent on line intersection simulation */}
+            <div
+                className="absolute left-[6%] top-[45%] w-2 h-2 rounded-full bg-green-500/60"
+                style={{
+                    transform: `translateY(${parallax1 * 0.8}px)`,
+                    boxShadow: "0 0 10px 2px rgba(34, 197, 94, 0.4)",
+                }}
+            />
+        </div>
     );
 }
