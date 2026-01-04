@@ -8,7 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "pages:build": "npx @cloudflare/next-on-pages",
+    "cf:build": "npx @opennextjs/cloudflare build",
+    "cf:dev": "npx wrangler dev",
+    "cf:deploy": "npx wrangler deploy",
     "electron-start": "npx electron .",
     "dist": "cross-env ELECTRON_BUILD=true npm run build && npx electron ."
   },
