@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 
+export const runtime = 'edge';
+
 export async function POST(req: Request) {
     try {
         const body = await req.json();

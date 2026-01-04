@@ -4,6 +4,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
+export const runtime = 'edge';
+
 const handler = NextAuth({
     providers: [
         GoogleProvider({
