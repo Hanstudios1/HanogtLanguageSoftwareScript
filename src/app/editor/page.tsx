@@ -1,14 +1,13 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Sidebar from "@/components/Editor/Sidebar";
 import CodeEditor from "@/components/Editor/CodeEditor";
 import Console from "@/components/Editor/Console";
 import AIAssistant from "@/components/Editor/AIAssistant";
-import { Play } from "lucide-react";
+import { Play, Plus, X } from "lucide-react";
 import { executeCode } from "@/services/piston";
-import Header from "@/components/Header";
 import { useSession } from "next-auth/react";
 import { saveProject, getProjects, getProjectsFromCloud } from "@/lib/storage";
 import { useI18n } from "@/lib/i18n";
@@ -31,33 +30,90 @@ const TEMPLATES: Record<string, string> = {
     kotlin: "fun main() {\n    println(\"Hello World from Hanogt!\")\n}",
     sql: "SELECT 'Hello World from Hanogt!' AS message;",
     lua: "print('Hello World from Hanogt!')",
-    // Fallback
     default: "// Start coding here...",
 };
 
+// Language list for modal
+const LANGUAGES = [
+    { name: "Python", ext: "py", logo: "/languages/python.png" },
+    { name: "JavaScript", ext: "js", logo: "/languages/javascript.png" },
+    { name: "TypeScript", ext: "ts", logo: "/languages/typescript.png" },
+    { name: "CSharp", ext: "cs", logo: "/languages/csharp.png" },
+    { name: "C++", ext: "cpp", logo: "/languages/cpp.png" },
+    { name: "Java", ext: "java", logo: "/languages/java.png" },
+    { name: "HTML", ext: "html", logo: "/languages/html.png" },
+    { name: "CSS", ext: "css", logo: "/languages/css.png" },
+    { name: "PHP", ext: "php", logo: "/languages/php.png" },
+    { name: "Go", ext: "go", logo: "/languages/go.png" },
+    { name: "Swift", ext: "swift", logo: "/languages/swift.png" },
+    { name: "Ruby", ext: "rb", logo: "/languages/ruby.png" },
+    { name: "Rust", ext: "rs", logo: "/languages/rust.png" },
+    { name: "Kotlin", ext: "kt", logo: "/languages/kotlin.png" },
+    { name: "SQL", ext: "sql", logo: "/languages/sql.png" },
+    { name: "Lua", ext: "lua", logo: "/languages/lua.png" },
+];
+
+// Tab interface
+interface Tab {
+    id: string;
+    name: string;
+    lang: string;
+    code: string;
+    output: string[];
+    isRunning: boolean;
+    isSaved: boolean;
+}
+
 function EditorContent() {
     const searchParams = useSearchParams();
-    const lang = searchParams.get("lang") || "javascript";
-    const projectId = searchParams.get("id"); // Get project ID from URL
+    const router = useRouter();
+    const initialLang = searchParams.get("lang") || "javascript";
+    const projectId = searchParams.get("id");
     const { data: session } = useSession();
     const { t } = useI18n();
 
-    const [code, setCode] = useState("");
-    const [output, setOutput] = useState<string[]>([]);
-    const [isRunning, setIsRunning] = useState(false);
+    // Multi-tab state
+    const [tabs, setTabs] = useState<Tab[]>([]);
+    const [activeTabId, setActiveTabId] = useState<string>("");
+    const [showLangModal, setShowLangModal] = useState(false);
     const [currentProjectId, setCurrentProjectId] = useState<number | null>(null);
     const [currentProjectName, setCurrentProjectName] = useState<string>("");
 
-    // Load existing project or set template
+    // Initialize first tab
     useEffect(() => {
         const loadProject = async () => {
+            // Check for unsaved tabs in localStorage
+            const savedTabs = localStorage.getItem("hanogt_unsaved_tabs");
+            if (savedTabs && !projectId) {
+                try {
+                    const parsedTabs = JSON.parse(savedTabs);
+                    if (parsedTabs.length > 0) {
+                        setTabs(parsedTabs);
+                        setActiveTabId(parsedTabs[0].id);
+                        return;
+                    }
+                } catch (e) {
+                    console.error("Error loading saved tabs:", e);
+                }
+            }
+
+            // Load existing project
             if (projectId && session?.user?.email) {
-                // Try to load from cloud first
                 try {
                     const cloudProjects = await getProjectsFromCloud(session.user.email);
                     const project = cloudProjects.find(p => String(p.id) === projectId);
                     if (project) {
-                        setCode(project.code);
+                        const newTab: Tab = {
+                            id: `tab-${Date.now()}`,
+                            name: project.name,
+                            lang: project.lang,
+                            code: project.code,
+                            output: [],
+                            isRunning: false,
+                            isSaved: true,
+                        };
+                        setTabs([newTab]);
+                        setActiveTabId(newTab.id);
                         setCurrentProjectId(Number(project.id));
                         setCurrentProjectName(project.name);
                         return;
@@ -66,45 +122,141 @@ function EditorContent() {
                     console.error("Error loading from cloud:", error);
                 }
 
-                // Fallback to localStorage
                 const localProjects = getProjects(session.user.email);
                 const project = localProjects.find(p => String(p.id) === projectId);
                 if (project) {
-                    setCode(project.code);
+                    const newTab: Tab = {
+                        id: `tab-${Date.now()}`,
+                        name: project.name,
+                        lang: project.lang,
+                        code: project.code,
+                        output: [],
+                        isRunning: false,
+                        isSaved: true,
+                    };
+                    setTabs([newTab]);
+                    setActiveTabId(newTab.id);
                     setCurrentProjectId(project.id);
                     setCurrentProjectName(project.name);
                     return;
                 }
             }
 
-            // No existing project, use template
-            setCode(TEMPLATES[lang] || TEMPLATES["default"]);
-            setCurrentProjectId(null);
-            setCurrentProjectName("");
+            // New project - create first tab
+            const langLower = initialLang.toLowerCase();
+            const newTab: Tab = {
+                id: `tab-${Date.now()}`,
+                name: `${langLower.charAt(0).toUpperCase() + langLower.slice(1)} ${t("my_lang_project_suffix") || "Projem"}`,
+                lang: langLower,
+                code: TEMPLATES[langLower] || TEMPLATES["default"],
+                output: [],
+                isRunning: false,
+                isSaved: false,
+            };
+            setTabs([newTab]);
+            setActiveTabId(newTab.id);
         };
 
         loadProject();
-    }, [lang, projectId, session]);
+    }, [initialLang, projectId, session]);
 
-    const handleRun = async () => {
-        setIsRunning(true);
-        setOutput([]);
+    // Save unsaved tabs to localStorage
+    useEffect(() => {
+        if (tabs.length > 0) {
+            const unsavedTabs = tabs.filter(t => !t.isSaved);
+            if (unsavedTabs.length > 0) {
+                localStorage.setItem("hanogt_unsaved_tabs", JSON.stringify(tabs));
+            } else {
+                localStorage.removeItem("hanogt_unsaved_tabs");
+            }
+        }
+    }, [tabs]);
 
-        try {
-            const result = await executeCode(lang, code);
-            setOutput([
-                `> Executing ${lang} script...`,
-                ...(result.run.stdout ? result.run.stdout.split('\n') : []),
-                ...(result.run.stderr ? [`Error: ${result.run.stderr}`] : []),
-                `> Process finished with exit code ${result.run.code}`
-            ]);
-        } catch (error) {
-            setOutput([`> Execution failed:`, String(error)]);
-        } finally {
-            setIsRunning(false);
+    // Get active tab
+    const activeTab = tabs.find(t => t.id === activeTabId);
+
+    // Add new tab
+    const handleAddTab = (langName: string) => {
+        const langLower = langName.toLowerCase();
+        const newTab: Tab = {
+            id: `tab-${Date.now()}`,
+            name: `${langName} Dosya`,
+            lang: langLower,
+            code: TEMPLATES[langLower] || TEMPLATES["default"],
+            output: [],
+            isRunning: false,
+            isSaved: false,
+        };
+        setTabs([...tabs, newTab]);
+        setActiveTabId(newTab.id);
+        setShowLangModal(false);
+    };
+
+    // Close tab
+    const handleCloseTab = (tabId: string) => {
+        const tabToClose = tabs.find(t => t.id === tabId);
+        if (tabToClose && !tabToClose.isSaved) {
+            if (!confirm(t("unsaved_close_warning") || "Bu sekme kaydedilmedi. Kapatmak istediğinize emin misiniz?")) {
+                return;
+            }
+        }
+
+        const newTabs = tabs.filter(t => t.id !== tabId);
+        if (newTabs.length === 0) {
+            // Don't allow closing last tab
+            return;
+        }
+        setTabs(newTabs);
+        if (activeTabId === tabId) {
+            setActiveTabId(newTabs[0].id);
         }
     };
 
+    // Update tab code
+    const handleCodeChange = (newCode: string) => {
+        setTabs(tabs.map(t =>
+            t.id === activeTabId
+                ? { ...t, code: newCode, isSaved: false }
+                : t
+        ));
+    };
+
+    // Run code
+    const handleRun = async () => {
+        if (!activeTab) return;
+
+        setTabs(tabs.map(t =>
+            t.id === activeTabId
+                ? { ...t, isRunning: true, output: [] }
+                : t
+        ));
+
+        try {
+            const result = await executeCode(activeTab.lang, activeTab.code);
+            setTabs(tabs.map(t =>
+                t.id === activeTabId
+                    ? {
+                        ...t,
+                        isRunning: false,
+                        output: [
+                            `> Executing ${activeTab.lang} script...`,
+                            ...(result.run.stdout ? result.run.stdout.split('\n') : []),
+                            ...(result.run.stderr ? [`Error: ${result.run.stderr}`] : []),
+                            `> Process finished with exit code ${result.run.code}`
+                        ]
+                    }
+                    : t
+            ));
+        } catch (error) {
+            setTabs(tabs.map(t =>
+                t.id === activeTabId
+                    ? { ...t, isRunning: false, output: [`> Execution failed:`, String(error)] }
+                    : t
+            ));
+        }
+    };
+
+    // Save project
     const handleSave = () => {
         if (!session?.user?.email) {
             alert(t("please_login_first") || "Lütfen önce giriş yapın!");
@@ -114,62 +266,75 @@ function EditorContent() {
         let projectName = currentProjectName;
         let projectIdToUse = currentProjectId;
 
-        // If this is a new project, ask for name
+        // Determine project name based on tabs
         if (!projectIdToUse) {
-            const defaultName = `${t("my_lang_project_prefix") || "Benim"} ${lang.charAt(0).toUpperCase() + lang.slice(1)} ${t("my_lang_project_suffix") || "Projem"}`;
-            const name = prompt(t("give_project_name") || "Projenize bir isim verin:", defaultName);
-            if (!name) return;
+            if (tabs.length === 1) {
+                // Single tab - ask for name
+                const defaultName = `${t("my_lang_project_prefix") || "Benim"} ${activeTab?.lang.charAt(0).toUpperCase()}${activeTab?.lang.slice(1)} ${t("my_lang_project_suffix") || "Projem"}`;
+                const name = prompt(t("give_project_name") || "Projenize bir isim verin:", defaultName);
+                if (!name) return;
+                projectName = name;
+            } else {
+                // Multiple tabs - auto name
+                projectName = t("general_project") || "Genel Proje";
+            }
 
-            projectName = name;
             projectIdToUse = Date.now();
             setCurrentProjectId(projectIdToUse);
-            setCurrentProjectName(name);
+            setCurrentProjectName(projectName);
         }
 
-        saveProject(session.user.email, {
+        // Save project with all tabs
+        const projectData = {
             id: projectIdToUse,
             name: projectName,
-            lang,
-            code,
-            date: new Date().toLocaleDateString("tr-TR", { hour: '2-digit', minute: '2-digit' })
-        });
+            lang: tabs.length === 1 ? tabs[0].lang : "multi",
+            code: tabs.length === 1 ? tabs[0].code : JSON.stringify(tabs.map(t => ({ name: t.name, lang: t.lang, code: t.code }))),
+            date: new Date().toLocaleDateString("tr-TR", { hour: '2-digit', minute: '2-digit' }),
+            isMultiTab: tabs.length > 1,
+        };
+
+        saveProject(session.user.email, projectData);
+
+        // Mark all tabs as saved
+        setTabs(tabs.map(t => ({ ...t, isSaved: true })));
+
+        // Clear unsaved tabs from localStorage
+        localStorage.removeItem("hanogt_unsaved_tabs");
 
         alert(t("project_saved") || "Proje başarıyla kaydedildi! Dashboard'da görebilirsiniz.");
     };
 
+    // Download
     const handleDownload = () => {
-        // File extensions for each language
+        if (!activeTab) return;
+
         const extensions: Record<string, string> = {
-            python: "py",
-            javascript: "js",
-            csharp: "cs",
-            cpp: "cpp",
-            java: "java",
-            html: "html",
-            css: "css",
-            php: "php",
-            go: "go",
-            swift: "swift",
-            sql: "sql",
-            lua: "lua",
-            typescript: "ts",
-            ruby: "rb",
-            rust: "rs",
-            kotlin: "kt",
+            python: "py", javascript: "js", typescript: "ts", csharp: "cs",
+            cpp: "cpp", java: "java", html: "html", css: "css",
+            php: "php", go: "go", swift: "swift", ruby: "rb",
+            rust: "rs", kotlin: "kt", sql: "sql", lua: "lua",
         };
 
-        const ext = extensions[lang.toLowerCase()] || "txt";
-        const fileName = currentProjectName
-            ? `${currentProjectName.replace(/[^a-zA-Z0-9]/g, "_")}.${ext}`
-            : `script.${ext}`;
+        const ext = extensions[activeTab.lang.toLowerCase()] || "txt";
+        const fileName = `${activeTab.name.replace(/[^a-zA-Z0-9]/g, "_")}.${ext}`;
 
         const element = document.createElement("a");
-        const file = new Blob([code], { type: 'text/plain' });
+        const file = new Blob([activeTab.code], { type: 'text/plain' });
         element.href = URL.createObjectURL(file);
         element.download = fileName;
         document.body.appendChild(element);
         element.click();
         document.body.removeChild(element);
+    };
+
+    // Clear output
+    const handleClearOutput = () => {
+        setTabs(tabs.map(t =>
+            t.id === activeTabId
+                ? { ...t, output: [] }
+                : t
+        ));
     };
 
     return (
@@ -179,27 +344,71 @@ function EditorContent() {
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col h-full relative">
+                {/* Tab Bar */}
+                <div className="h-12 border-b border-zinc-200 dark:border-zinc-800 flex items-center bg-white dark:bg-zinc-950 overflow-x-auto">
+                    {tabs.map((tab) => (
+                        <div
+                            key={tab.id}
+                            className={`flex items-center gap-2 px-4 h-full border-r border-zinc-200 dark:border-zinc-800 cursor-pointer transition-colors ${activeTabId === tab.id
+                                    ? "bg-zinc-100 dark:bg-zinc-900"
+                                    : "hover:bg-zinc-50 dark:hover:bg-zinc-900/50"
+                                }`}
+                            onClick={() => setActiveTabId(tab.id)}
+                        >
+                            <img
+                                src={`/languages/${tab.lang.toLowerCase()}.png`}
+                                alt={tab.lang}
+                                className="w-4 h-4 object-contain"
+                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                            />
+                            <span className="text-sm font-medium truncate max-w-[120px]">
+                                {tab.name}
+                                {!tab.isSaved && <span className="text-orange-500 ml-1">•</span>}
+                            </span>
+                            {tabs.length > 1 && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCloseTab(tab.id);
+                                    }}
+                                    className="p-0.5 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded"
+                                >
+                                    <X className="w-3 h-3" />
+                                </button>
+                            )}
+                        </div>
+                    ))}
+
+                    {/* New Tab Button */}
+                    <button
+                        onClick={() => setShowLangModal(true)}
+                        className="flex items-center gap-1 px-3 h-full bg-zinc-900 dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
+                    >
+                        <Plus className="w-4 h-4" />
+                        <span className="text-sm font-medium">{t("new_tab") || "Yeni Sekme"}</span>
+                    </button>
+                </div>
+
                 {/* Top Bar for Run Button */}
-                <div className="h-16 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-6 bg-white dark:bg-zinc-950">
+                <div className="h-14 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-6 bg-white dark:bg-zinc-950">
                     <h2 className="font-bold text-lg capitalize flex items-center gap-2">
                         <img
-                            src={`/languages/${lang.toLowerCase()}.png`}
-                            alt={lang}
+                            src={`/languages/${activeTab?.lang.toLowerCase()}.png`}
+                            alt={activeTab?.lang}
                             className="w-6 h-6 object-contain"
-                            onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                            }}
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
                         />
-                        {currentProjectName || `${lang} Project`}
+                        {currentProjectName || activeTab?.name || "Project"}
                     </h2>
 
                     <div className="flex items-center gap-3">
                         <button
                             onClick={handleRun}
-                            className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-full font-bold flex items-center gap-2 shadow-lg hover:shadow-green-500/30 transition-all"
+                            disabled={activeTab?.isRunning}
+                            className="px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-800 text-white rounded-full font-bold flex items-center gap-2 shadow-lg hover:shadow-green-500/30 transition-all"
                         >
                             <Play className="w-4 h-4 fill-current" />
-                            RUN
+                            {activeTab?.isRunning ? "Running..." : "RUN"}
                         </button>
                     </div>
                 </div>
@@ -208,23 +417,65 @@ function EditorContent() {
                 <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
                     {/* Editor Area */}
                     <div className="flex-1 h-[60%] lg:h-full p-2 lg:p-4">
-                        <CodeEditor
-                            language={lang === 'c++' ? 'cpp' : lang}
-                            theme="dark" // Default to dark for editor
-                            value={code}
-                            onChange={(val) => setCode(val || "")}
-                        />
+                        {activeTab && (
+                            <CodeEditor
+                                language={activeTab.lang === 'c++' ? 'cpp' : activeTab.lang}
+                                theme="dark"
+                                value={activeTab.code}
+                                onChange={(val) => handleCodeChange(val || "")}
+                            />
+                        )}
                     </div>
 
                     {/* Console Area (Right Side) */}
                     <div className="h-[40%] lg:h-full lg:w-[400px] border-t lg:border-t-0 lg:border-l border-zinc-200 dark:border-zinc-800 bg-zinc-900 p-2 lg:p-4">
-                        <Console output={output} isRunning={isRunning} onClear={() => setOutput([])} />
+                        <Console
+                            output={activeTab?.output || []}
+                            isRunning={activeTab?.isRunning || false}
+                            onClear={handleClearOutput}
+                        />
                     </div>
                 </div>
 
                 {/* AI Overlay */}
                 <AIAssistant />
             </div>
+
+            {/* Language Selection Modal */}
+            {showLangModal && (
+                <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-zinc-900 rounded-3xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-zinc-200 dark:border-zinc-800">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold">{t("select_language") || "Bir Yazılım Dili Seç"}</h2>
+                            <button
+                                onClick={() => setShowLangModal(false)}
+                                className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                            {LANGUAGES.map((lang) => (
+                                <button
+                                    key={lang.name}
+                                    onClick={() => handleAddTab(lang.name)}
+                                    className="flex flex-col items-center justify-center p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border-2 border-transparent hover:border-blue-500 transition-all gap-3"
+                                >
+                                    <div className="w-12 h-12 rounded-full overflow-hidden bg-white dark:bg-zinc-900 shadow-md flex items-center justify-center p-2">
+                                        <img
+                                            src={lang.logo}
+                                            alt={`${lang.name} logo`}
+                                            className="w-full h-full object-contain"
+                                        />
+                                    </div>
+                                    <span className="font-semibold text-zinc-700 dark:text-zinc-200">{lang.name}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

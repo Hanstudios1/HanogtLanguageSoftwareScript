@@ -82,6 +82,10 @@ const DICTIONARY: Record<Language, Translations> = {
         no_keep_project: "Hayır, Projemi Silmeyeceğim",
         yes_delete_project: "Tamam, Projemi Sonsuza Dek Kaldırın",
         edited: "Düzenlendi",
+        // Multi-tab editor
+        new_tab: "Yeni Sekme",
+        general_project: "Genel Proje",
+        unsaved_close_warning: "Bu sekme kaydedilmedi. Kapatmak istediğinize emin misiniz?",
         // Timeline features
         why_features: "Neden",
         features_subtitle: "Modern geliştiriciler için tasarlandı. Her özellik, kodlama deneyiminizi daha iyi hale getirmek için düşünüldü.",
