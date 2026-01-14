@@ -304,6 +304,9 @@ function EditorContent() {
         }
     };
 
+    // Track if project was originally single-tab
+    const [wasOriginallyMultiTab, setWasOriginallyMultiTab] = useState<boolean | null>(null);
+
     // Save project
     const handleSave = () => {
         if (!session?.user?.email) {
@@ -313,23 +316,28 @@ function EditorContent() {
 
         let projectName = currentProjectName;
         let projectIdToUse = currentProjectId;
+        const isNowMultiTab = tabs.length > 1;
 
-        // Always ask for name on new project
-        if (!projectIdToUse) {
+        // Ask for name if: new project OR single-tab became multi-tab
+        const shouldAskName = !projectIdToUse || (wasOriginallyMultiTab === false && isNowMultiTab);
+
+        if (shouldAskName) {
             let defaultName: string;
-            if (tabs.length === 1) {
-                // Single tab - default to language name
-                defaultName = `${t("my_lang_project_prefix") || "Benim"} ${activeTab?.lang.charAt(0).toUpperCase()}${activeTab?.lang.slice(1)} ${t("my_lang_project_suffix") || "Projem"}`;
-            } else {
+            if (isNowMultiTab) {
                 // Multiple tabs - default to "Genel Projem"
                 defaultName = t("general_project") || "Genel Projem";
+            } else {
+                // Single tab - default to language name
+                defaultName = `${t("my_lang_project_prefix") || "Benim"} ${activeTab?.lang.charAt(0).toUpperCase()}${activeTab?.lang.slice(1)} ${t("my_lang_project_suffix") || "Projem"}`;
             }
 
             const name = prompt(t("give_project_name") || "Projenize bir isim verin:", defaultName);
             if (!name) return;
             projectName = name;
 
-            projectIdToUse = Date.now();
+            if (!projectIdToUse) {
+                projectIdToUse = Date.now();
+            }
             setCurrentProjectId(projectIdToUse);
             setCurrentProjectName(projectName);
         }
@@ -345,6 +353,9 @@ function EditorContent() {
         };
 
         saveProject(session.user.email, projectData);
+
+        // Update tracking
+        setWasOriginallyMultiTab(isNowMultiTab);
 
         // Mark all tabs as saved
         setTabs(tabs.map(t => ({ ...t, isSaved: true })));

@@ -84,14 +84,49 @@ export default function DashboardPage() {
         router.push(`/editor?lang=${lang.toLowerCase()}`);
     };
 
-    const handleDownloadProject = (project: any) => {
-        const element = document.createElement("a");
-        const file = new Blob([project.code || "// Empty project"], { type: "text/plain" });
-        element.href = URL.createObjectURL(file);
-        element.download = `${project.name}.${project.lang}`;
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
+    const handleDownloadProject = async (project: any) => {
+        const extensions: Record<string, string> = {
+            python: "py", javascript: "js", typescript: "ts", csharp: "cs",
+            cpp: "cpp", java: "java", html: "html", css: "css",
+            php: "php", go: "go", swift: "swift", ruby: "rb",
+            rust: "rs", kotlin: "kt", sql: "sql", lua: "lua",
+        };
+
+        if (project.isMultiTab || project.lang === "multi") {
+            // Multi-tab project - download as ZIP
+            try {
+                const JSZip = (await import('jszip')).default;
+                const zip = new JSZip();
+                const tabsData = JSON.parse(project.code);
+
+                tabsData.forEach((tab: any, index: number) => {
+                    const ext = extensions[tab.lang.toLowerCase()] || "txt";
+                    const fileName = `${index + 1}_${tab.name.replace(/[^a-zA-Z0-9]/g, "_")}.${ext}`;
+                    zip.file(fileName, tab.code);
+                });
+
+                const content = await zip.generateAsync({ type: 'blob' });
+                const element = document.createElement("a");
+                element.href = URL.createObjectURL(content);
+                element.download = `${project.name.replace(/[^a-zA-Z0-9]/g, "_")}.zip`;
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            } catch (error) {
+                console.error("Error creating ZIP:", error);
+                alert("ZIP oluşturulamadı");
+            }
+        } else {
+            // Single-tab project - download as file
+            const ext = extensions[project.lang.toLowerCase()] || "txt";
+            const element = document.createElement("a");
+            const file = new Blob([project.code || "// Empty project"], { type: "text/plain" });
+            element.href = URL.createObjectURL(file);
+            element.download = `${project.name.replace(/[^a-zA-Z0-9]/g, "_")}.${ext}`;
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
         setOpenMenuId(null);
     };
 
