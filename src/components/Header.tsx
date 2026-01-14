@@ -41,8 +41,8 @@ export default function Header() {
 
     return (
         <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-                ? "py-2 backdrop-blur-xl bg-white/90 dark:bg-zinc-950/90 shadow-lg"
-                : "py-4 backdrop-blur-md bg-white/80 dark:bg-zinc-950/80"
+            ? "py-2 backdrop-blur-xl bg-white/90 dark:bg-zinc-950/90 shadow-lg"
+            : "py-4 backdrop-blur-md bg-white/80 dark:bg-zinc-950/80"
             } border-b border-zinc-200 dark:border-zinc-800`}>
             <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
                 {/* Logo */}
@@ -58,7 +58,7 @@ export default function Header() {
                         className={`object-contain hidden dark:block transition-all duration-300 ${isScrolled ? "w-10 h-10" : "w-14 h-14"}`}
                     />
 
-                    <h1 className={`font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600 transition-all duration-300 ${isScrolled ? "text-lg" : "text-xl"}`}>
+                    <h1 className={`font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600 transition-all duration-300 ${isScrolled ? "text-lg opacity-0 w-0 overflow-hidden" : "text-xl opacity-100"}`}>
                         Hanogt Codev
                     </h1>
                 </Link>

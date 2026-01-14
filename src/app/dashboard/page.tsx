@@ -243,7 +243,7 @@ export default function DashboardPage() {
             {/* Language Selection Modal */}
             {showLangModal && (
                 <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white dark:bg-zinc-900 rounded-3xl p-8 max-w-4xl w-full shadow-2xl border border-zinc-200 dark:border-zinc-800">
+                    <div className="bg-white dark:bg-zinc-900 rounded-3xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-zinc-200 dark:border-zinc-800">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-2xl font-bold">{t("select_language") || "Bir Yazılım Dili Seç"}</h2>
                             <button
