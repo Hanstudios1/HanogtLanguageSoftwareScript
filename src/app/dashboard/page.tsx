@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Code, FileCode, Clock, MoreVertical, Download, Trash2 } from "lucide-react";
+import { Plus, Code, FileCode, Clock, MoreVertical, Download, Trash2, FolderOpen } from "lucide-react";
 import Header from "@/components/Header";
 import PrivacyPolicyModal from "@/components/PrivacyPolicyModal";
 import DeleteProjectModal from "@/components/DeleteProjectModal";
@@ -178,16 +178,20 @@ export default function DashboardPage() {
                                             className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center cursor-pointer overflow-hidden"
                                             onClick={() => router.push(`/editor?lang=${p.lang}&id=${p.id}`)}
                                         >
-                                            <img
-                                                src={LANGUAGES.find(l => l.name.toLowerCase() === p.lang.toLowerCase())?.logo || `/languages/${p.lang.toLowerCase()}.png`}
-                                                alt={p.lang}
-                                                className="w-7 h-7 object-contain"
-                                                onError={(e) => {
-                                                    // Fallback to text if image fails
-                                                    e.currentTarget.style.display = 'none';
-                                                    e.currentTarget.parentElement!.innerHTML = `<span class="text-blue-600 dark:text-blue-400 font-bold uppercase text-xs">${p.lang.substring(0, 2)}</span>`;
-                                                }}
-                                            />
+                                            {p.isMultiTab || p.lang === "multi" ? (
+                                                <FolderOpen className="w-6 h-6 text-blue-500" />
+                                            ) : (
+                                                <img
+                                                    src={LANGUAGES.find(l => l.name.toLowerCase() === p.lang.toLowerCase())?.logo || `/languages/${p.lang.toLowerCase()}.png`}
+                                                    alt={p.lang}
+                                                    className="w-7 h-7 object-contain"
+                                                    onError={(e) => {
+                                                        // Fallback to text if image fails
+                                                        e.currentTarget.style.display = 'none';
+                                                        e.currentTarget.parentElement!.innerHTML = `<span class="text-blue-600 dark:text-blue-400 font-bold uppercase text-xs">${p.lang.substring(0, 2)}</span>`;
+                                                    }}
+                                                />
+                                            )}
                                         </div>
 
                                         {/* Three Dots Menu */}

@@ -356,7 +356,7 @@ function EditorContent() {
     };
 
     // Download
-    const handleDownload = () => {
+    const handleDownload = async () => {
         if (!activeTab) return;
 
         const extensions: Record<string, string> = {
@@ -366,16 +366,53 @@ function EditorContent() {
             rust: "rs", kotlin: "kt", sql: "sql", lua: "lua",
         };
 
-        const ext = extensions[activeTab.lang.toLowerCase()] || "txt";
-        const fileName = `${activeTab.name.replace(/[^a-zA-Z0-9]/g, "_")}.${ext}`;
+        if (tabs.length === 1) {
+            // Single tab - download as file
+            const ext = extensions[activeTab.lang.toLowerCase()] || "txt";
+            const fileName = `${activeTab.name.replace(/[^a-zA-Z0-9]/g, "_")}.${ext}`;
 
-        const element = document.createElement("a");
-        const file = new Blob([activeTab.code], { type: 'text/plain' });
-        element.href = URL.createObjectURL(file);
-        element.download = fileName;
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
+            const element = document.createElement("a");
+            const file = new Blob([activeTab.code], { type: 'text/plain' });
+            element.href = URL.createObjectURL(file);
+            element.download = fileName;
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        } else {
+            // Multi-tab - download as ZIP
+            // Using JSZip dynamically
+            try {
+                const JSZip = (await import('jszip')).default;
+                const zip = new JSZip();
+
+                tabs.forEach((tab, index) => {
+                    const ext = extensions[tab.lang.toLowerCase()] || "txt";
+                    const fileName = `${index + 1}_${tab.name.replace(/[^a-zA-Z0-9]/g, "_")}.${ext}`;
+                    zip.file(fileName, tab.code);
+                });
+
+                const content = await zip.generateAsync({ type: 'blob' });
+                const element = document.createElement("a");
+                element.href = URL.createObjectURL(content);
+                element.download = `${currentProjectName || "project"}.zip`;
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            } catch (error) {
+                // Fallback: download each file separately
+                tabs.forEach((tab, index) => {
+                    const ext = extensions[tab.lang.toLowerCase()] || "txt";
+                    const fileName = `${index + 1}_${tab.name.replace(/[^a-zA-Z0-9]/g, "_")}.${ext}`;
+                    const element = document.createElement("a");
+                    const file = new Blob([tab.code], { type: 'text/plain' });
+                    element.href = URL.createObjectURL(file);
+                    element.download = fileName;
+                    document.body.appendChild(element);
+                    element.click();
+                    document.body.removeChild(element);
+                });
+            }
+        }
     };
 
     // Clear output

@@ -243,6 +243,10 @@ const DICTIONARY: Record<Language, Translations> = {
         no_keep_project: "No, Keep My Project",
         yes_delete_project: "Yes, Delete My Project Forever",
         edited: "Edited",
+        // Multi-tab editor
+        new_tab: "New Tab",
+        general_project: "General Project",
+        unsaved_close_warning: "This tab is not saved. Are you sure you want to close it?",
         // Timeline features
         why_features: "Why",
         features_subtitle: "Designed for modern developers. Every feature is crafted to enhance your coding experience.",
