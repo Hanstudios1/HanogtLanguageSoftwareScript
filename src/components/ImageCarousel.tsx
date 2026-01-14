@@ -83,8 +83,11 @@ export default function ImageSliderComparison() {
                             className="w-full h-full object-cover object-left"
                             draggable={false}
                         />
-                        {/* Label */}
-                        <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg z-20">
+                        {/* Label - fades out as slider moves right */}
+                        <div
+                            className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg z-20 transition-opacity duration-200"
+                            style={{ opacity: sliderPosition < 85 ? 1 : 0 }}
+                        >
                             ✓ Hanogt Codev
                         </div>
                     </div>
