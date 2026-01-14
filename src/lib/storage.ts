@@ -19,6 +19,7 @@ export interface Project {
     date: string;
     email: string;
     createdAt?: any;
+    isMultiTab?: boolean;
 }
 
 const COLLECTION_NAME = "projects";
@@ -78,6 +79,7 @@ export interface LegacyProject {
     code: string;
     date: string;
     email: string;
+    isMultiTab?: boolean;
 }
 
 const STORAGE_KEY = "hanogt_projects";

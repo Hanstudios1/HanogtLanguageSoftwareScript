@@ -84,7 +84,7 @@ const DICTIONARY: Record<Language, Translations> = {
         edited: "Düzenlendi",
         // Multi-tab editor
         new_tab: "Yeni Sekme",
-        general_project: "Genel Proje",
+        general_project: "Genel Projem",
         unsaved_close_warning: "Bu sekme kaydedilmedi. Kapatmak istediğinize emin misiniz?",
         // Timeline features
         why_features: "Neden",

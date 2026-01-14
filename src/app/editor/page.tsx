@@ -103,6 +103,30 @@ function EditorContent() {
                     const cloudProjects = await getProjectsFromCloud(session.user.email);
                     const project = cloudProjects.find(p => String(p.id) === projectId);
                     if (project) {
+                        // Check if it's a multi-tab project
+                        if (project.isMultiTab || project.lang === "multi") {
+                            try {
+                                const parsedTabs = JSON.parse(project.code);
+                                const loadedTabs: Tab[] = parsedTabs.map((t: any, i: number) => ({
+                                    id: `tab-${Date.now()}-${i}`,
+                                    name: t.name,
+                                    lang: t.lang,
+                                    code: t.code,
+                                    output: [],
+                                    isRunning: false,
+                                    isSaved: true,
+                                }));
+                                setTabs(loadedTabs);
+                                setActiveTabId(loadedTabs[0].id);
+                                setCurrentProjectId(Number(project.id));
+                                setCurrentProjectName(project.name);
+                                return;
+                            } catch (e) {
+                                console.error("Error parsing multi-tab project:", e);
+                            }
+                        }
+
+                        // Single tab project
                         const newTab: Tab = {
                             id: `tab-${Date.now()}`,
                             name: project.name,
@@ -125,6 +149,30 @@ function EditorContent() {
                 const localProjects = getProjects(session.user.email);
                 const project = localProjects.find(p => String(p.id) === projectId);
                 if (project) {
+                    // Check if it's a multi-tab project
+                    if (project.isMultiTab || project.lang === "multi") {
+                        try {
+                            const parsedTabs = JSON.parse(project.code);
+                            const loadedTabs: Tab[] = parsedTabs.map((t: any, i: number) => ({
+                                id: `tab-${Date.now()}-${i}`,
+                                name: t.name,
+                                lang: t.lang,
+                                code: t.code,
+                                output: [],
+                                isRunning: false,
+                                isSaved: true,
+                            }));
+                            setTabs(loadedTabs);
+                            setActiveTabId(loadedTabs[0].id);
+                            setCurrentProjectId(project.id);
+                            setCurrentProjectName(project.name);
+                            return;
+                        } catch (e) {
+                            console.error("Error parsing multi-tab project:", e);
+                        }
+                    }
+
+                    // Single tab project
                     const newTab: Tab = {
                         id: `tab-${Date.now()}`,
                         name: project.name,
@@ -266,18 +314,20 @@ function EditorContent() {
         let projectName = currentProjectName;
         let projectIdToUse = currentProjectId;
 
-        // Determine project name based on tabs
+        // Always ask for name on new project
         if (!projectIdToUse) {
+            let defaultName: string;
             if (tabs.length === 1) {
-                // Single tab - ask for name
-                const defaultName = `${t("my_lang_project_prefix") || "Benim"} ${activeTab?.lang.charAt(0).toUpperCase()}${activeTab?.lang.slice(1)} ${t("my_lang_project_suffix") || "Projem"}`;
-                const name = prompt(t("give_project_name") || "Projenize bir isim verin:", defaultName);
-                if (!name) return;
-                projectName = name;
+                // Single tab - default to language name
+                defaultName = `${t("my_lang_project_prefix") || "Benim"} ${activeTab?.lang.charAt(0).toUpperCase()}${activeTab?.lang.slice(1)} ${t("my_lang_project_suffix") || "Projem"}`;
             } else {
-                // Multiple tabs - auto name
-                projectName = t("general_project") || "Genel Proje";
+                // Multiple tabs - default to "Genel Projem"
+                defaultName = t("general_project") || "Genel Projem";
             }
+
+            const name = prompt(t("give_project_name") || "Projenize bir isim verin:", defaultName);
+            if (!name) return;
+            projectName = name;
 
             projectIdToUse = Date.now();
             setCurrentProjectId(projectIdToUse);
@@ -350,8 +400,8 @@ function EditorContent() {
                         <div
                             key={tab.id}
                             className={`flex items-center gap-2 px-4 h-full border-r border-zinc-200 dark:border-zinc-800 cursor-pointer transition-colors ${activeTabId === tab.id
-                                    ? "bg-zinc-100 dark:bg-zinc-900"
-                                    : "hover:bg-zinc-50 dark:hover:bg-zinc-900/50"
+                                ? "bg-zinc-100 dark:bg-zinc-900"
+                                : "hover:bg-zinc-50 dark:hover:bg-zinc-900/50"
                                 }`}
                             onClick={() => setActiveTabId(tab.id)}
                         >
