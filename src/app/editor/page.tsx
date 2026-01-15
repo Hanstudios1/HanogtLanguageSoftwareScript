@@ -6,7 +6,7 @@ import Sidebar from "@/components/Editor/Sidebar";
 import CodeEditor from "@/components/Editor/CodeEditor";
 import Console from "@/components/Editor/Console";
 import AIAssistant from "@/components/Editor/AIAssistant";
-import { Play, Plus, X } from "lucide-react";
+import { Play, Plus, X, MoreVertical, Pencil } from "lucide-react";
 import { executeCode } from "@/services/piston";
 import { useSession } from "next-auth/react";
 import { saveProject, getProjects, getProjectsFromCloud } from "@/lib/storage";
@@ -85,13 +85,17 @@ function EditorContent() {
     const [saveModalInputName, setSaveModalInputName] = useState("");
     const [pendingSaveCallback, setPendingSaveCallback] = useState<((name: string | null) => void) | null>(null);
 
+    // Tab menu state
+    const [openTabMenuId, setOpenTabMenuId] = useState<string | null>(null);
 
     // Initialize first tab
     useEffect(() => {
         const loadProject = async () => {
-            // Check for unsaved tabs in localStorage
+            // Check for unsaved tabs in localStorage ONLY if no specific lang/project is requested
             const savedTabs = localStorage.getItem("hanogt_unsaved_tabs");
-            if (savedTabs && !projectId) {
+            const urlHasLang = new URLSearchParams(window.location.search).has("lang");
+
+            if (savedTabs && !projectId && !urlHasLang) {
                 try {
                     const parsedTabs = JSON.parse(savedTabs);
                     if (parsedTabs.length > 0) {
@@ -267,6 +271,23 @@ function EditorContent() {
         }
     };
 
+    // Rename tab
+    const handleRenameTab = (tabId: string) => {
+        const tab = tabs.find(t => t.id === tabId);
+        if (!tab) return;
+
+        const newName = prompt(t("rename_tab_prompt") || "Sekme adını girin:", tab.name);
+        if (!newName || newName === tab.name) {
+            setOpenTabMenuId(null);
+            return;
+        }
+
+        setTabs(tabs.map(t =>
+            t.id === tabId ? { ...t, name: newName, isSaved: false } : t
+        ));
+        setOpenTabMenuId(null);
+    };
+
     // Update tab code
     const handleCodeChange = (newCode: string) => {
         setTabs(tabs.map(t =>
@@ -361,7 +382,7 @@ function EditorContent() {
 
             // Show custom modal
             setSaveModalDefaultName(defaultName);
-            setSaveModalInputName(isConvertingToMultiTab ? currentProjectName : defaultName);
+            setSaveModalInputName(defaultName);
             setShowSaveModal(true);
             return;
         }
@@ -458,12 +479,40 @@ function EditorContent() {
                     {tabs.map((tab) => (
                         <div
                             key={tab.id}
-                            className={`flex items-center gap-2 px-4 h-full border-r border-zinc-200 dark:border-zinc-800 cursor-pointer transition-colors ${activeTabId === tab.id
+                            className={`relative flex items-center gap-2 px-4 h-full border-r border-zinc-200 dark:border-zinc-800 cursor-pointer transition-colors ${activeTabId === tab.id
                                 ? "bg-zinc-100 dark:bg-zinc-900"
                                 : "hover:bg-zinc-50 dark:hover:bg-zinc-900/50"
                                 }`}
                             onClick={() => setActiveTabId(tab.id)}
                         >
+                            {/* 3-dot menu */}
+                            <div className="relative">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setOpenTabMenuId(openTabMenuId === tab.id ? null : tab.id);
+                                    }}
+                                    className="p-0.5 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded"
+                                >
+                                    <MoreVertical className="w-3 h-3" />
+                                </button>
+
+                                {openTabMenuId === tab.id && (
+                                    <div className="absolute left-0 top-full mt-1 w-40 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden z-50">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleRenameTab(tab.id);
+                                            }}
+                                            className="w-full flex items-center gap-2 px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-sm text-zinc-700 dark:text-zinc-300"
+                                        >
+                                            <Pencil className="w-3 h-3" />
+                                            {t("rename_tab") || "İsmini Değiştir"}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
                             <img
                                 src={`/languages/${tab.lang.toLowerCase()}.png`}
                                 alt={tab.lang}
@@ -507,7 +556,7 @@ function EditorContent() {
                             className="w-6 h-6 object-contain"
                             onError={(e) => { e.currentTarget.style.display = 'none'; }}
                         />
-                        {currentProjectName || activeTab?.name || "Project"}
+                        {activeTab?.name || "Project"}
                     </h2>
 
                     <div className="flex items-center gap-3">
