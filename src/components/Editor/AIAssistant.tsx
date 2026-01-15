@@ -105,7 +105,10 @@ export default function AIAssistant({
 
     const handleApprove = (index: number) => {
         const message = messages[index];
+        console.log("Approve clicked, message:", message);
+        console.log("Action data:", message.action);
         if (message.action) {
+            console.log("Calling onApplyAction with:", message.action);
             onApplyAction(message.action);
             setMessages(prev => prev.map((m, i) =>
                 i === index ? { ...m, status: "approved" as const } : m
@@ -211,17 +214,17 @@ export default function AIAssistant({
                                     {/* Action Card */}
                                     {msg.action && msg.role === "ai" ? (
                                         <div className={`rounded-xl border overflow-hidden ${msg.status === "approved"
-                                                ? "border-green-500 bg-green-50 dark:bg-green-900/20"
-                                                : msg.status === "rejected"
-                                                    ? "border-red-500 bg-red-50 dark:bg-red-900/20 opacity-50"
-                                                    : "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                                            ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                                            : msg.status === "rejected"
+                                                ? "border-red-500 bg-red-50 dark:bg-red-900/20 opacity-50"
+                                                : "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
                                             }`}>
                                             {/* Action Header */}
                                             <div className={`flex items-center gap-2 px-3 py-2 text-sm font-medium ${msg.status === "approved"
-                                                    ? "bg-green-500 text-white"
-                                                    : msg.status === "rejected"
-                                                        ? "bg-red-500 text-white"
-                                                        : "bg-blue-500 text-white"
+                                                ? "bg-green-500 text-white"
+                                                : msg.status === "rejected"
+                                                    ? "bg-red-500 text-white"
+                                                    : "bg-blue-500 text-white"
                                                 }`}>
                                                 {getActionIcon(msg.action.action)}
                                                 {getActionLabel(msg.action.action)}

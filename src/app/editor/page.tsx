@@ -296,14 +296,20 @@ function EditorContent() {
         tabLang?: string;
         newName?: string;
     }) => {
+        console.log("AI Action received:", action);
+        console.log("Active tab:", activeTab);
+        console.log("Active tab ID:", activeTabId);
+
         switch (action.action) {
             case "EDIT_CODE":
-                if (action.code && activeTab) {
-                    setTabs(tabs.map(t =>
+                console.log("EDIT_CODE - code length:", action.code?.length);
+                if (action.code) {
+                    setTabs(prevTabs => prevTabs.map(t =>
                         t.id === activeTabId
                             ? { ...t, code: action.code!, isSaved: false }
                             : t
                     ));
+                    console.log("Code updated successfully");
                 }
                 break;
 
@@ -318,31 +324,34 @@ function EditorContent() {
                         isRunning: false,
                         isSaved: false,
                     };
-                    setTabs([...tabs, newTab]);
+                    setTabs(prevTabs => [...prevTabs, newTab]);
                     setActiveTabId(newTab.id);
+                    console.log("Tab created:", newTab.name);
                 }
                 break;
 
             case "DELETE_TAB":
-                if (tabs.length > 1 && activeTab) {
+                if (tabs.length > 1) {
                     const newTabs = tabs.filter(t => t.id !== activeTabId);
                     setTabs(newTabs);
                     setActiveTabId(newTabs[0].id);
+                    console.log("Tab deleted");
                 }
                 break;
 
             case "RENAME_TAB":
-                if (action.newName && activeTab) {
-                    setTabs(tabs.map(t =>
+                if (action.newName) {
+                    setTabs(prevTabs => prevTabs.map(t =>
                         t.id === activeTabId
                             ? { ...t, name: action.newName!, isSaved: false }
                             : t
                     ));
+                    console.log("Tab renamed to:", action.newName);
                 }
                 break;
 
             case "EXPLAIN":
-                // Just explanation, no action needed
+                console.log("EXPLAIN action - no code change needed");
                 break;
         }
     };
