@@ -342,9 +342,12 @@ function EditorContent() {
             setCurrentProjectName(projectName);
         }
 
+        // Ensure we have a valid project ID
+        const finalProjectId = projectIdToUse || Date.now();
+
         // Save project with all tabs
         const projectData = {
-            id: projectIdToUse,
+            id: finalProjectId,
             name: projectName,
             lang: tabs.length === 1 ? tabs[0].lang : "multi",
             code: tabs.length === 1 ? tabs[0].code : JSON.stringify(tabs.map(t => ({ name: t.name, lang: t.lang, code: t.code }))),
