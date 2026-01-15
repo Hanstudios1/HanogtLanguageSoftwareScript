@@ -475,7 +475,7 @@ function EditorContent() {
             {/* Main Content */}
             <div className="flex-1 flex flex-col h-full relative">
                 {/* Tab Bar */}
-                <div className="h-12 border-b border-zinc-200 dark:border-zinc-800 flex items-center bg-white dark:bg-zinc-950 overflow-x-auto">
+                <div className="h-12 border-b border-zinc-200 dark:border-zinc-800 flex items-center bg-white dark:bg-zinc-950 overflow-visible">
                     {tabs.map((tab) => (
                         <div
                             key={tab.id}
