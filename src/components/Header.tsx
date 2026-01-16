@@ -105,12 +105,12 @@ export default function Header() {
                                     {/* Menu Items */}
                                     <div className="p-2">
                                         <Link
-                                            href="/settings"
+                                            href="/account-settings"
                                             onClick={() => setShowProfileMenu(false)}
                                             className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-700 dark:text-zinc-300"
                                         >
                                             <Settings className="w-5 h-5" />
-                                            {t("settings")}
+                                            {t("account_settings") || "Hesap Ayarları"}
                                         </Link>
 
                                         <button
