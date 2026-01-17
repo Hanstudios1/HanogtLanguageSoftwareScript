@@ -75,7 +75,19 @@ export default function Home() {
           <p className="text-zinc-500 dark:text-zinc-400 text-sm">
             © 2025 Hanogt Codev. {t("all_rights_reserved") || "Tüm hakları saklıdır."}
           </p>
-          <div className="flex items-center gap-6 text-sm">
+          <div className="flex items-center gap-6 text-sm flex-wrap justify-center">
+            <a
+              href="/about"
+              className="text-zinc-600 dark:text-zinc-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+            >
+              {t("about_link") || "Hakkımızda"}
+            </a>
+            <a
+              href="/feedback"
+              className="text-zinc-600 dark:text-zinc-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+            >
+              {t("feedback_link") || "Geri Bildirim/SSS"}
+            </a>
             <a
               href="/terms-of-use"
               className="text-zinc-600 dark:text-zinc-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
