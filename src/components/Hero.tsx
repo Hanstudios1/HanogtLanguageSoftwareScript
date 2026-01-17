@@ -37,9 +37,10 @@ export default function Hero() {
     }, []);
 
     const handleDownload = (platform: Platform) => {
-        // For now, only Windows is available
         if (platform === "windows") {
             window.location.href = "/HanogtSetup.exe";
+        } else if (platform === "android") {
+            window.location.href = "/Hanogt-Codev.apk";
         } else {
             alert(`${platform.toUpperCase()} sürümü yakında gelecek!`);
         }
