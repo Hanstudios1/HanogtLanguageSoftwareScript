@@ -1,3 +1,5 @@
+import { checkMaliciousCode, SecurityCheckResult } from "@/lib/hanogtBot";
+
 export interface ExecuteResponse {
     run: {
         stdout: string;
@@ -9,7 +11,40 @@ export interface ExecuteResponse {
     version: string;
 }
 
+export interface SecureExecuteResult {
+    response?: ExecuteResponse;
+    blocked: boolean;
+    securityCheck?: SecurityCheckResult;
+}
+
 const PISTON_API = "https://emkc.org/api/v2/piston/execute";
+
+/**
+ * Execute code with security check
+ * Returns blocked: true if malicious code detected
+ */
+export const executeCodeSecure = async (
+    language: string,
+    source: string,
+    userEmail?: string
+): Promise<SecureExecuteResult> => {
+    // Security check first
+    const securityCheck = checkMaliciousCode(source);
+
+    if (securityCheck.isMalicious) {
+        return {
+            blocked: true,
+            securityCheck
+        };
+    }
+
+    // If not malicious, execute normally
+    const response = await executeCode(language, source);
+    return {
+        response,
+        blocked: false
+    };
+};
 
 export const executeCode = async (language: string, source: string): Promise<ExecuteResponse> => {
     // Map our language names to Piston API names

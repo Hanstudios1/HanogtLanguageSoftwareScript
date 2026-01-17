@@ -7,8 +7,9 @@ import CodeEditor from "@/components/Editor/CodeEditor";
 import Console from "@/components/Editor/Console";
 import TestPreview from "@/components/Editor/TestPreview";
 import AIAssistant from "@/components/Editor/AIAssistant";
-import { Play, Plus, X, MoreVertical, Pencil } from "lucide-react";
-import { executeCode } from "@/services/piston";
+import { Play, Plus, X, MoreVertical, Pencil, ShieldAlert } from "lucide-react";
+import { executeCode, executeCodeSecure } from "@/services/piston";
+import { isUserBanned, banUser, logSecurityEvent } from "@/lib/hanogtBot";
 import { useSession } from "next-auth/react";
 import { saveProject, getProjects, getProjectsFromCloud } from "@/lib/storage";
 import { useI18n } from "@/lib/i18n";
@@ -313,7 +314,7 @@ function EditorContent() {
             return;
         }
 
-        // For other languages, run via Piston API
+        // For other languages, run via Piston API with security check
         setTabs(prevTabs => prevTabs.map(t =>
             t.id === activeTabId
                 ? { ...t, isRunning: true, output: [] }
@@ -321,21 +322,76 @@ function EditorContent() {
         ));
 
         try {
-            const result = await executeCode(activeTab.lang, activeTab.code);
-            setTabs(prevTabs => prevTabs.map(t =>
-                t.id === activeTabId
-                    ? {
-                        ...t,
-                        isRunning: false,
-                        output: [
-                            `> Executing ${activeTab.lang} script...`,
-                            ...(result.run.stdout ? result.run.stdout.split('\n') : []),
-                            ...(result.run.stderr ? [`Error: ${result.run.stderr}`] : []),
-                            `> Process finished with exit code ${result.run.code}`
-                        ]
+            // Use secure execution with malicious code check
+            const secureResult = await executeCodeSecure(activeTab.lang, activeTab.code, session?.user?.email || undefined);
+
+            if (secureResult.blocked && secureResult.securityCheck) {
+                const { threats, severity, shouldBan } = secureResult.securityCheck;
+
+                // Log security event
+                if (session?.user?.email) {
+                    await logSecurityEvent(
+                        session.user.email,
+                        shouldBan ? "ban" : "block",
+                        secureResult.securityCheck,
+                        activeTab.code
+                    );
+
+                    // Ban user if severity is high enough
+                    if (shouldBan) {
+                        await banUser(
+                            session.user.email,
+                            `Zararlı kod tespit edildi: ${threats.join(", ")}`,
+                            activeTab.code
+                        );
                     }
-                    : t
-            ));
+                }
+
+                // Pre-build security messages to avoid shadowing 't' in map callback
+                const securityMessages = [
+                    `🛡️ [Hanogt Security Bot] ${t("malicious_code_detected") || "Zararlı kod tespit edildi!"}`,
+                    ``,
+                    `⚠️ ${t("detected_threats") || "Tespit edilen tehditler"}: ${threats.join(", ")}`,
+                    `📊 ${t("threat_level") || "Tehdit seviyesi"}: ${severity.toUpperCase()}`,
+                    ``,
+                    shouldBan
+                        ? `🚫 ${t("account_banned") || "Hesabınız güvenlik nedeniyle engellenmiştir."}`
+                        : `⛔ ${t("code_blocked") || "Kod çalıştırma engellendi."}`,
+                    ``,
+                    `${t("security_warning") || "Zararlı kod çalıştırmak yasaktır ve hesap engellemeye yol açar."}`
+                ];
+
+                setTabs(prevTabs => prevTabs.map(tab =>
+                    tab.id === activeTabId
+                        ? {
+                            ...tab,
+                            isRunning: false,
+                            output: securityMessages
+                        }
+                        : tab
+                ));
+                setOutputTab("test");
+                return;
+            }
+
+            // Code is safe, show execution result
+            if (secureResult.response) {
+                const result = secureResult.response;
+                setTabs(prevTabs => prevTabs.map(t =>
+                    t.id === activeTabId
+                        ? {
+                            ...t,
+                            isRunning: false,
+                            output: [
+                                `> Executing ${activeTab.lang} script...`,
+                                ...(result.run.stdout ? result.run.stdout.split('\n') : []),
+                                ...(result.run.stderr ? [`Error: ${result.run.stderr}`] : []),
+                                `> Process finished with exit code ${result.run.code}`
+                            ]
+                        }
+                        : t
+                ));
+            }
             // Switch to Test tab to show output
             setOutputTab("test");
         } catch (error) {

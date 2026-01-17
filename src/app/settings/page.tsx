@@ -21,6 +21,13 @@ export default function EditorSettingsPage() {
     const [bracketPairColorization, setBracketPairColorization] = useState(true);
     const [cursorStyle, setCursorStyle] = useState("line");
     const [smoothScrolling, setSmoothScrolling] = useState(true);
+    // New settings
+    const [autoCloseBrackets, setAutoCloseBrackets] = useState(true);
+    const [autoCloseQuotes, setAutoCloseQuotes] = useState(true);
+    const [formatOnPaste, setFormatOnPaste] = useState(false);
+    const [highlightActiveLine, setHighlightActiveLine] = useState(true);
+    const [renderIndentGuides, setRenderIndentGuides] = useState(true);
+    const [cursorBlinking, setCursorBlinking] = useState("blink");
 
     // Load settings from localStorage
     useEffect(() => {
@@ -38,6 +45,13 @@ export default function EditorSettingsPage() {
             setBracketPairColorization(settings.bracketPairColorization ?? true);
             setCursorStyle(settings.cursorStyle || "line");
             setSmoothScrolling(settings.smoothScrolling ?? true);
+            // New settings
+            setAutoCloseBrackets(settings.autoCloseBrackets ?? true);
+            setAutoCloseQuotes(settings.autoCloseQuotes ?? true);
+            setFormatOnPaste(settings.formatOnPaste ?? false);
+            setHighlightActiveLine(settings.highlightActiveLine ?? true);
+            setRenderIndentGuides(settings.renderIndentGuides ?? true);
+            setCursorBlinking(settings.cursorBlinking || "blink");
         }
     }, []);
 
@@ -54,14 +68,20 @@ export default function EditorSettingsPage() {
             fontFamily,
             bracketPairColorization,
             cursorStyle,
-            smoothScrolling
+            smoothScrolling,
+            autoCloseBrackets,
+            autoCloseQuotes,
+            formatOnPaste,
+            highlightActiveLine,
+            renderIndentGuides,
+            cursorBlinking
         };
         localStorage.setItem("hanogt_editor_settings", JSON.stringify(settings));
     };
 
     useEffect(() => {
         saveSettings();
-    }, [fontSize, tabSize, wordWrap, lineNumbers, minimap, autoSave, theme, fontFamily, bracketPairColorization, cursorStyle, smoothScrolling]);
+    }, [fontSize, tabSize, wordWrap, lineNumbers, minimap, autoSave, theme, fontFamily, bracketPairColorization, cursorStyle, smoothScrolling, autoCloseBrackets, autoCloseQuotes, formatOnPaste, highlightActiveLine, renderIndentGuides, cursorBlinking]);
 
     const fontFamilies = [
         "JetBrains Mono",
@@ -278,7 +298,7 @@ export default function EditorSettingsPage() {
                     </div>
 
                     {/* Smooth Scrolling Toggle */}
-                    <div className="flex items-center justify-between py-4">
+                    <div className="flex items-center justify-between py-4 border-b border-zinc-100 dark:border-zinc-800">
                         <div>
                             <span className="block">{t("smooth_scrolling") || "Yumuşak Kaydırma"}</span>
                             <span className="text-sm text-zinc-500">{t("smooth_scrolling_desc") || "Editör içinde yumuşak kaydırma"}</span>
@@ -288,6 +308,76 @@ export default function EditorSettingsPage() {
                             className={`w-12 h-6 rounded-full transition-all ${smoothScrolling ? "bg-blue-600" : "bg-zinc-300 dark:bg-zinc-700"}`}
                         >
                             <div className={`w-5 h-5 bg-white rounded-full transition-all ${smoothScrolling ? "translate-x-6" : "translate-x-0.5"}`} />
+                        </button>
+                    </div>
+
+                    {/* Auto Close Brackets Toggle */}
+                    <div className="flex items-center justify-between py-4 border-b border-zinc-100 dark:border-zinc-800">
+                        <div>
+                            <span className="block">{t("auto_close_brackets") || "Otomatik Parantez Kapatma"}</span>
+                            <span className="text-sm text-zinc-500">{t("auto_close_brackets_desc") || "( [ { karakterlerini otomatik kapat"}</span>
+                        </div>
+                        <button
+                            onClick={() => setAutoCloseBrackets(!autoCloseBrackets)}
+                            className={`w-12 h-6 rounded-full transition-all ${autoCloseBrackets ? "bg-blue-600" : "bg-zinc-300 dark:bg-zinc-700"}`}
+                        >
+                            <div className={`w-5 h-5 bg-white rounded-full transition-all ${autoCloseBrackets ? "translate-x-6" : "translate-x-0.5"}`} />
+                        </button>
+                    </div>
+
+                    {/* Auto Close Quotes Toggle */}
+                    <div className="flex items-center justify-between py-4 border-b border-zinc-100 dark:border-zinc-800">
+                        <div>
+                            <span className="block">{t("auto_close_quotes") || "Otomatik Tırnak Kapatma"}</span>
+                            <span className="text-sm text-zinc-500">{t("auto_close_quotes_desc") || "' \" karakterlerini otomatik kapat"}</span>
+                        </div>
+                        <button
+                            onClick={() => setAutoCloseQuotes(!autoCloseQuotes)}
+                            className={`w-12 h-6 rounded-full transition-all ${autoCloseQuotes ? "bg-blue-600" : "bg-zinc-300 dark:bg-zinc-700"}`}
+                        >
+                            <div className={`w-5 h-5 bg-white rounded-full transition-all ${autoCloseQuotes ? "translate-x-6" : "translate-x-0.5"}`} />
+                        </button>
+                    </div>
+
+                    {/* Format On Paste Toggle */}
+                    <div className="flex items-center justify-between py-4 border-b border-zinc-100 dark:border-zinc-800">
+                        <div>
+                            <span className="block">{t("format_on_paste") || "Yapıştırırken Biçimlendir"}</span>
+                            <span className="text-sm text-zinc-500">{t("format_on_paste_desc") || "Yapıştırılan kodu otomatik biçimlendir"}</span>
+                        </div>
+                        <button
+                            onClick={() => setFormatOnPaste(!formatOnPaste)}
+                            className={`w-12 h-6 rounded-full transition-all ${formatOnPaste ? "bg-blue-600" : "bg-zinc-300 dark:bg-zinc-700"}`}
+                        >
+                            <div className={`w-5 h-5 bg-white rounded-full transition-all ${formatOnPaste ? "translate-x-6" : "translate-x-0.5"}`} />
+                        </button>
+                    </div>
+
+                    {/* Highlight Active Line Toggle */}
+                    <div className="flex items-center justify-between py-4 border-b border-zinc-100 dark:border-zinc-800">
+                        <div>
+                            <span className="block">{t("highlight_active_line") || "Aktif Satırı Vurgula"}</span>
+                            <span className="text-sm text-zinc-500">{t("highlight_active_line_desc") || "Geçerli satırı vurgula"}</span>
+                        </div>
+                        <button
+                            onClick={() => setHighlightActiveLine(!highlightActiveLine)}
+                            className={`w-12 h-6 rounded-full transition-all ${highlightActiveLine ? "bg-blue-600" : "bg-zinc-300 dark:bg-zinc-700"}`}
+                        >
+                            <div className={`w-5 h-5 bg-white rounded-full transition-all ${highlightActiveLine ? "translate-x-6" : "translate-x-0.5"}`} />
+                        </button>
+                    </div>
+
+                    {/* Render Indent Guides Toggle */}
+                    <div className="flex items-center justify-between py-4">
+                        <div>
+                            <span className="block">{t("indent_guides") || "Girinti Kılavuzları"}</span>
+                            <span className="text-sm text-zinc-500">{t("indent_guides_desc") || "Görsel girinti çizgileri göster"}</span>
+                        </div>
+                        <button
+                            onClick={() => setRenderIndentGuides(!renderIndentGuides)}
+                            className={`w-12 h-6 rounded-full transition-all ${renderIndentGuides ? "bg-blue-600" : "bg-zinc-300 dark:bg-zinc-700"}`}
+                        >
+                            <div className={`w-5 h-5 bg-white rounded-full transition-all ${renderIndentGuides ? "translate-x-6" : "translate-x-0.5"}`} />
                         </button>
                     </div>
                 </section>
