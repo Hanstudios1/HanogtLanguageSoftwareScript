@@ -2,7 +2,7 @@ const { app, BrowserWindow, shell } = require('electron');
 const path = require('path');
 
 // Your deployed website URL
-const WEBSITE_URL = 'https://hanogt.pages.dev';
+const WEBSITE_URL = 'https://hanogtcodev.vercel.app';
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
