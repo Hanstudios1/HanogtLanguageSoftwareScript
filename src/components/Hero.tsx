@@ -6,22 +6,18 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useI18n } from "@/lib/i18n";
 
-type Platform = "windows" | "macos" | "linux" | "android" | "ios";
+type Platform = "windows" | "linux" | "android";
 
 const PLATFORMS: { id: Platform; name: string; logo: string; ext: string }[] = [
     { id: "windows", name: "Windows", logo: "/platforms/windows.png", ext: ".exe" },
-    { id: "macos", name: "macOS", logo: "/platforms/macos.png", ext: ".dmg" },
     { id: "linux", name: "Linux", logo: "/platforms/linux.png", ext: ".AppImage" },
     { id: "android", name: "Android", logo: "/platforms/android.png", ext: ".apk" },
-    { id: "ios", name: "iOS", logo: "/platforms/ios.png", ext: ".ipa" },
 ];
 
 function detectPlatform(): Platform {
     if (typeof window === "undefined") return "windows";
     const ua = navigator.userAgent.toLowerCase();
     if (ua.includes("android")) return "android";
-    if (ua.includes("iphone") || ua.includes("ipad")) return "ios";
-    if (ua.includes("mac")) return "macos";
     if (ua.includes("linux")) return "linux";
     return "windows";
 }
@@ -38,11 +34,12 @@ export default function Hero() {
 
     const handleDownload = (platform: Platform) => {
         if (platform === "windows") {
-            window.location.href = "/HanogtSetup.exe";
+            // GitHub Releases - Always downloads latest version
+            window.location.href = "https://github.com/Hanstudios1/HanogtCodev/releases/latest/download/HanogtCodev-Setup.exe";
         } else if (platform === "android") {
             window.location.href = "/Hanogt-Codev.apk";
-        } else {
-            alert(`${platform.toUpperCase()} sürümü yakında gelecek!`);
+        } else if (platform === "linux") {
+            window.location.href = "https://github.com/Hanstudios1/HanogtCodev/releases/latest/download/HanogtCodev.AppImage";
         }
         setShowDropdown(false);
     };
