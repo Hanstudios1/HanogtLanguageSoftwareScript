@@ -1,5 +1,16 @@
-const { app, BrowserWindow, shell } = require('electron');
+const { app, BrowserWindow, shell, protocol, net } = require('electron');
 const path = require('path');
+const url = require('url');
+
+// Custom protocol for serving static files
+function createProtocol() {
+    protocol.handle('app', (request) => {
+        const requestUrl = request.url.substring('app://'.length);
+        const decodedUrl = decodeURIComponent(requestUrl);
+        const filePath = path.join(__dirname, '..', 'out', decodedUrl);
+        return net.fetch(url.pathToFileURL(filePath).toString());
+    });
+}
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
@@ -16,34 +27,33 @@ function createWindow() {
         autoHideMenuBar: true
     });
 
-    // Load the production URL or local dev server
-    const isProd = !process.env.ELECTRON_DEV;
-
-    if (isProd) {
-        // In production, load from the local static files
-        mainWindow.loadFile(path.join(__dirname, '../out/index.html'));
-    } else {
-        // In development, load from Next.js dev server
-        mainWindow.loadURL('http://localhost:3000');
-    }
+    // Load the production build
+    const indexPath = path.join(__dirname, '../out/index.html');
+    mainWindow.loadFile(indexPath);
 
     // Open external links in the default browser
     mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-        shell.openExternal(url);
-        return { action: 'deny' };
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            shell.openExternal(url);
+            return { action: 'deny' };
+        }
+        return { action: 'allow' };
     });
 
-    // Navigate internal links correctly
-    mainWindow.webContents.on('will-navigate', (event, url) => {
-        const parsedUrl = new URL(url);
-        if (parsedUrl.hostname !== 'localhost' && !parsedUrl.protocol.startsWith('file')) {
-            event.preventDefault();
-            shell.openExternal(url);
+    // Handle navigation for internal links
+    mainWindow.webContents.on('will-navigate', (event, navUrl) => {
+        const parsedUrl = new URL(navUrl);
+        if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+            if (!navUrl.includes('localhost')) {
+                event.preventDefault();
+                shell.openExternal(navUrl);
+            }
         }
     });
 }
 
 app.whenReady().then(() => {
+    createProtocol();
     createWindow();
 
     app.on('activate', () => {
