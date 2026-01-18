@@ -116,7 +116,7 @@ export default function Hero() {
 
                         {/* Dropdown Menu */}
                         {showDropdown && (
-                            <div className="absolute top-full mt-2 left-0 right-0 bg-white dark:bg-zinc-800 rounded-xl shadow-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden z-50 min-w-[200px]">
+                            <div className="absolute top-full mt-2 left-0 right-0 bg-white dark:bg-zinc-800 rounded-xl shadow-2xl border border-zinc-200 dark:border-zinc-700 z-50 min-w-[220px]">
                                 {PLATFORMS.map((platform) => (
                                     <button
                                         key={platform.id}
