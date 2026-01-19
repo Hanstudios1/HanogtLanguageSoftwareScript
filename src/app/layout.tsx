@@ -15,8 +15,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hanogt Codev - Ücretsiz Online Kod Editörü",
+  title: "Hanogt Codev",
   description: "Hanogt Codev ile istediğin dilde özgürce kodla. %100 ücretsiz, reklamsız, sınırsız.",
+  icons: {
+    icon: "/logo-dark.png",
+    shortcut: "/logo-dark.png",
+    apple: "/logo-dark.png",
+  },
 };
 
 export default function RootLayout({
