@@ -199,14 +199,14 @@ export default function FeedbackPage() {
         const item = items.find(i => i.id === itemId);
         if (!item) return;
 
-        const newComment: Comment = {
+        const newComment = {
             id: `comment_${Date.now()}`,
             author: displayName,
             authorEmail: session.user.email,
             content: commentText[itemId].trim(),
-            replyTo: replyingTo?.commentId || undefined,
-            replyToContent: replyingTo?.content || undefined,
-            createdAt: new Date()
+            replyTo: replyingTo?.commentId || null,
+            replyToContent: replyingTo?.content || null,
+            createdAt: new Date().toISOString()
         };
 
         try {
@@ -215,9 +215,10 @@ export default function FeedbackPage() {
             });
             setCommentText(prev => ({ ...prev, [itemId]: "" }));
             setReplyingTo(null);
-            fetchItems();
+            await fetchItems();
         } catch (error) {
             console.error("Error adding comment:", error);
+            alert("Yorum gönderilemedi. Lütfen tekrar deneyin.");
         }
     };
 

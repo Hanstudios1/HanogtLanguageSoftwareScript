@@ -1,70 +1,62 @@
 # Hanogt Codev
 
-**HanogtCodev**, kullanıcıların tarayıcıda veya masaüstünde diledikleri gibi kod yazıp çalıştırabilecekleri, açık kaynaklı, modern ve güçlü bir IDE (Entegre Geliştirme Ortamı) projesidir.
+**HanogtCodev** - Kullanıcıların tarayıcıda veya masaüstünde diledikleri gibi kod yazıp çalıştırabilecekleri, açık kaynaklı, modern ve güçlü bir IDE.
 
-![App Screenshot](https://via.placeholder.com/1200x600?text=Hanogt+Software+Preview) <!-- Buraya kendi ekran görüntünüzü ekleyebilirsiniz -->
+🌐 **Canlı Site:** [hanogtcodev.com](https://hanogtcodev.com)
 
 ## 🚀 Özellikler
 
-*   **Çoklu Dil Desteği:** Python, JavaScript, C++, C#, Java, Go, PHP, Swift, Lua, HTML ve SQL.
-*   **Gerçek Kod Çalıştırma (Piston API):** Yazdığınız kodlar sunucu tabanlı güvenli bir ortamda çalıştırılır ve çıktısı anlık olarak konsola yansıtılır.
-*   **Modern Arayüz:** Göz yormayan Karanlık Mod (Dark Mode) ve Türkçe/İngilizce dil desteği.
-*   **Masaüstü Uygulaması:** Electron altyapısı sayesinde Windows, Linux ve macOS üzerinde yerel bir uygulama gibi çalışır.
-*   **AI Kodlama Asistanı:** Kod yazarken takıldığınızda size yardımcı olan yapay zeka destekli sohbet botu.
-*   **%100 Ücretsiz ve Özgür:** Sınır yok, reklam yok.
+- **Çoklu Dil Desteği:** Python, JavaScript, C++, C#, Java, Go, PHP, Swift, Lua, HTML ve SQL
+- **Gerçek Kod Çalıştırma:** Piston API ile güvenli sunucu ortamında kod çalıştırma
+- **Modern Arayüz:** Dark/Light Mode + Türkçe/İngilizce dil desteği
+- **Masaüstü Uygulaması:** Windows, Linux ve macOS desteği (Electron)
+- **AI Kodlama Asistanı:** Yapay zeka destekli kod yardımcısı
+- **Geri Bildirim Sistemi:** Kullanıcılar soru sorabilir, yorum yapabilir
+- **%100 Ücretsiz:** Sınır yok, reklam yok
 
 ## 📦 Kurulum
 
-Projeyi kendi bilgisayarınızda çalıştırmak veya geliştirmek için aşağıdaki adımları izleyin.
-
 ### Gereksinimler
-*   [Node.js](https://nodejs.org/) (Sürüm 18 veya üzeri)
-*   Git
+- [Node.js](https://nodejs.org/) v18+
+- Git
 
-### Adım 1: Projeyi Klonlayın
+### Hızlı Başlangıç
 ```bash
 git clone https://github.com/Hanstudios1/HanogtCodev.git
 cd HanogtCodev
-```
-
-### Adım 2: Bağımlılıkları Yükleyin
-```bash
 npm install
-```
-
-### Adım 3: Çalıştırın (Web Modu)
-Tarayıcıda geliştirme yapmak için:
-```bash
 npm run dev
 ```
 Adres: `http://localhost:3000`
 
-### Adım 4: Masaüstü Uygulamasını Başlatın
-Electron penceresinde açmak için:
+### Masaüstü Uygulaması
 ```bash
 npm run dist
 ```
 
-## 🛠 Kullanılan Teknolojiler
-*   **Framework:** [Next.js 15](https://nextjs.org/) (App Directory)
-*   **Dil:** TypeScript
-*   **Stil:** TailwindCSS
-*   **Editör:** Monaco Editor (VS Code Editor)
-*   **Masaüstü Paketleme:** Electron.js
-*   **Kod Çalıştırma:** Piston API
-*   **İkonlar:** Lucide React
+## 🛠 Teknolojiler
+
+| Kategori | Teknoloji |
+|----------|-----------|
+| Framework | Next.js 15 |
+| Dil | TypeScript |
+| Stil | TailwindCSS |
+| Editör | Monaco Editor |
+| Masaüstü | Electron.js |
+| Kod Çalıştırma | Piston API |
+| Veritabanı | Firebase |
+| Auth | NextAuth.js |
 
 ## 🤝 Katkıda Bulunma
-Bu proje açık kaynaklıdır ve her türlü katkıya açıktır! Pull Request (PR) göndermekten çekinmeyin.
 
-1.  Projeyi Fork'layın.
-2.  Yeni bir Branch oluşturun (`git checkout -b feature/YeniOzellik`).
-3.  Değişikliklerinizi yapın ve Commit'leyin (`git commit -m 'Yeni özellik eklendi'`).
-4.  Branch'inizi Push'layın (`git push origin feature/YeniOzellik`).
-5.  Bir Pull Request oluşturun.
+1. Fork'layın
+2. Branch oluşturun (`git checkout -b feature/YeniOzellik`)
+3. Commit'leyin (`git commit -m 'Yeni özellik'`)
+4. Push'layın (`git push origin feature/YeniOzellik`)
+5. Pull Request açın
 
 ## 📄 Lisans
-Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır. Dilediğiniz gibi kullanabilir, değiştirebilir ve dağıtabilirsiniz.
+MIT Lisansı - Dilediğiniz gibi kullanabilirsiniz.
 
 ---
 **Geliştirici:** Oğuz Han Guluzade
